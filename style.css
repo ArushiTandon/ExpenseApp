@@ -270,11 +270,11 @@ form {
     
     .toggle-panel {
         width: 100%;
-        height: 50%;
+        height: 40%;
     }
     
     .toggle-panel.toggle-left {
-        top: 0;
+        top: -60px;
     }
     
     .container.active .toggle-panel.toggle-left {
@@ -288,7 +288,7 @@ form {
     }
     
     .container.active .toggle-panel.toggle-right {
-        bottom: 0;
+        bottom: -60px;
     }   
 }
 
