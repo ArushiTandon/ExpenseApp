@@ -10,8 +10,9 @@ async function register(event) {
     const user = { username, email, password }
 
     try {
-        await axios.post(`${apiUrl}/signup`, user);
+      const response =  await axios.post(`${apiUrl}/signup`, user);
         console.log("User created successfully");
+        alert(response.data.message);
         
     } catch (error) {
         console.error("Unable to SignUp:", error);
