@@ -23,14 +23,6 @@ const User = sequelize.define('User', {
     },
 });
 
-(async () => {
-    try {
-      await sequelize.sync();
-      console.log('Database synced!');
-    } catch (error) {
-      console.error('Error syncing database:', error);
-    }
-  });
 
 User.beforeCreate(async (user) => {
     user.password = await bcrypt.hash(user.password, 10);

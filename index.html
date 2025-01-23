@@ -11,14 +11,14 @@
 <body>
     <div class="container">
         <div class="form-box login">
-            <form action="">
+            <form id="loginform" name="loginform" onsubmit="login(event)">
                 <h1>Login</h1>
                 <div class="input-box">
-                    <input type="text" placeholder="Username" required>
+                    <input type="text" name="loginusername" id="loginusername" placeholder="Username" required>
                     <i class='bx bxs-user'></i>
                 </div>
                 <div class="input-box">
-                    <input type="password" placeholder="Password" required>
+                    <input type="password" name="loginpassword" id="loginpassword" placeholder="Password" required>
                     <i class='bx bxs-lock-alt'></i>
                 </div>
                 <div class="forgot-link">
@@ -36,18 +36,18 @@
         </div>
 
         <div class="form-box signUp"> 
-            <form action="">
+            <form  id="signUp" onsubmit="register(event)">
                 <h1>Sign Up</h1>
                  <div class="input-box">
-                    <input type="text" id="usernme" placeholder="Username" required>
+                    <input type="text" name="username" id="username" placeholder="Username" required>
                     <i class='bx bxs-user'></i>
                 </div>
                 <div class="input-box">
-                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="email" name="email" id="email" placeholder="Email" required>
                     <i class='bx bxs-envelope'></i>
                 </div>
                 <div class="input-box">
-                    <input type="password" id="password" placeholder="Password" required>
+                    <input type="password" name="password" id="password" placeholder="Password" required>
                     <i class='bx bxs-lock-alt'></i>
                 </div>
                 <button type="submit" class="btn">Sign Up</button>
@@ -74,6 +74,9 @@
             </div>
         </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="script.js"></script>
+    <script src="scriptf.js"></script>
 </body>
 </html>

@@ -5,4 +5,5 @@ const sequelize = new Sequelize('expenseapp' , 'root', 'arushi@mysql', {
     dialect: 'mysql',
 });
 
+
 module.exports = sequelize;
