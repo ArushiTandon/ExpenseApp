@@ -14,17 +14,23 @@ const PORT = 3000;
 // middlewares
 app.use(cors());
 app.use(bodyParser.json());
+
+app.use('/expenseForm', express.static(path.join(__dirname, 'expenseForm')));
 app.use(express.static(__dirname));
 
-app.get('/user', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// Routes
+app.get('/addExpense', (req, res) => {
+    res.sendFile(path.join(__dirname, 'expenseForm', 'index.html'));
 });
 
-// use routes
+app.get('/user', (req, res) => {
+    res.sendFile(path.join(__dirname, 'user.html')); // Ensure this file exists in the root directory
+});
+
 app.use('/user', userRoutes);
+app.use('/expense', expenseRoutes);
 
-
-sequelize.sync({ force: false }) 
+sequelize.sync({ force: false })
     .then(() => {
         console.log('Database synced');
         app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));

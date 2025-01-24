@@ -1,12 +1,10 @@
-const db = require('../util/db');
-const { QueryTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 // const { generateToken } = require('../util/jwt');
 
 
 exports.signUp = async (req, res) => {
-    console.log('signup Request Body(LoginController):', req.body);
+    // console.log('signup Request Body(LoginController):', req.body);
     const {username, email, password} = req.body;
 
     try {
