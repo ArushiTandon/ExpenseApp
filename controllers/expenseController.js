@@ -11,9 +11,9 @@ exports.getExpenses = async (req, res) => {
 };
 
 exports.addExpense = async (req, res) => {
-    const { amount, description, category } = req.body;
+    const { amount, description, category, date } = req.body;
     try {
-        const newExpense = await Expense.create({ amount, description, category });
+        const newExpense = await Expense.create({ amount, description, category, date });
         res.status(201).json(newExpense);
     } catch (err) {
         console.error('Error adding expense:', err);
@@ -39,7 +39,7 @@ exports.deleteExpense = async (req, res) => {
 
 exports.updateExpense = async (req, res) => {
     const { id } = req.params;
-    const { amount, description, category } = req.body;
+    const { amount, description, category, date } = req.body;
 
     try {
         const existingExpense = await Expense.findByPk(id);
@@ -48,7 +48,7 @@ exports.updateExpense = async (req, res) => {
             return res.status(404).json({ error: 'Expense not found' });
         }
 
-        await existingExpense.update({ amount, description, category });
+        await existingExpense.update({ amount, description, category, date });
 
         res.status(200).json({ message: 'Expense updated successfully' });
     } catch (err) {
@@ -56,3 +56,15 @@ exports.updateExpense = async (req, res) => {
         res.status(500).json({ error: 'Error updating expense' });
     }
 };
+
+exports.searchExpense = async (req, res) => {
+    const { date } = req.params;
+    
+    try {
+        const expense = await Expense.findAll({ where: { date } });
+        res.status(200).json(expense);
+    } catch (err) {
+        console.error('Error fetching expenses:', err);
+        res.status(500).json({ error: 'Error fetching expenses' });
+    }
+}

@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
-// const { generateToken } = require('../util/jwt');
+const { generateToken } = require('../util/jwt');
 
 
 exports.signUp = async (req, res) => {
@@ -42,12 +42,12 @@ exports.login = async(req, res) => {
             return res.status(401).json({error: 'Invalid username or password'});
         }
 
-        // const payload = {
-        //     id: user.id,
-        //     username: user.username,
-        // };
+        const payload = {
+            id: user.id,
+            username: user.username,
+        };
 
-        // const token = generateToken(payload);
+        const token = generateToken(payload);
 
         return res.status(200).json({message: 'Login successful!'});
 

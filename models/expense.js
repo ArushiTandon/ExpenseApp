@@ -2,8 +2,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../util/db');
 
 const expense = sequelize.define('Expense', {
-    username: {
-        amount: DataTypes.INTEGER,
+    amount: {
+        type: DataTypes.FLOAT,
         allowNull: false,
     },
 
@@ -16,6 +16,12 @@ const expense = sequelize.define('Expense', {
         type: DataTypes.STRING,
         allowNull: false
     },
+
+    date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    }
 });
 
 

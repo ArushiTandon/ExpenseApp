@@ -1,54 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expense Tracker</title>
-    <link rel="stylesheet" href="expenseForm.css">
+    <link rel="stylesheet" href="expenseForm.css" />
 </head>
+
 <body>
-    <div>
-    <h1> Expense Tracker </h1>
+    <div class="container">
+        <h1>Expense Tracker</h1>
 
-    <form id = "Tracker" onsubmit="addExpense(event)">
-
-    <div>
-        <label for = "amount" class="form-label">Amount:</label>
-        <div class="input-group">
-        <span class="input-group-text">₹</span>
-        <input type = "number" name = "amount" id="amount" class="form-control" required>
+        <div class="date-box">
+            <div>
+                <label for="date" class="form-label">Select A Date:</label>
+                <input type="date" name="date" id="date" class="form-control" />
+            </div>
+            <br><br><br>
+            <div>
+                <button type="button" name="searchBtn" id="searchBtn" onclick="searchExpense(event)">
+                    Search
+                </button>
+            </div>
         </div>
-    </div> 
 
-    <div>
-        <label for = "text" class="form-label">Description:</label>
-        <input type = "text" name = "text" id="text" class="form-control" placeholder="Description here" required>
+        <div class="form-box">
+            <form id="Tracker" data-id="" onsubmit="saveOrUpdate(event)">
+                <div>
+                    <label for="amount" class="form-label">Amount:</label>
+                    <div class="input-group">
+                        <span class="input-group-text">₹</span>
+                        <input type="number" name="amount" id="amount" class="form-control" required />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="text" class="form-label">Description:</label>
+                    <input type="text" name="text" id="text" class="form-control" placeholder="Description here"
+                        required />
+                </div>
+
+                <div>
+                    <label for="expense" class="form-label">Category:</label>
+                    <select name="expense" id="expense" class="form-select">
+                        <option value="Food">Food</option>
+                        <option value="Movie">Movie</option>
+                        <option value="Health">Health</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>
+                        <button type="submit" class="exp-btn">Add Expense</button>
+                    </label>
+                </div>
+            </form>
+        </div>
+
+        <ul id="userList" name="userList" class="userList"></ul>
     </div>
-
-    <div>
-        <label for="expense" class="form-label">Category:</label>
-        <select name = "expense" id="expense" class="form-select">
-          <option value="Food">Food</option>
-          <option value="Movie">Movie</option>
-          <option value="Health">Health</option>
-          <option value="Rent">Rent</option>
-          <option value="Travel">Travel</option>
-          <option value="Others">Others</option>
-        </select>
-    </div>
-
-    <div >
-        <label>
-        <button type="submit" class="exp-btn">Add Expense</button>
-        </label>
-    </div>
-    </form>
-
-    <ul id="userList" name="userList" class="userList"> </ul>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src = "expenseForm.js"></script>
-
+    <script src="expenseForm.js"></script>
 </body>
+
 </html>

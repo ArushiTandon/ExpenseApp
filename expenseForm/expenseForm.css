@@ -1,0 +1,102 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+
+body {
+    margin: 0;
+    font-family: Poppins, sans-serif;
+    background: linear-gradient(to right, #f7f9f7, #dde7dd);
+    color: #333;
+}
+
+
+.container {
+    max-width: 80%;
+    margin: 40px auto;
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+}
+
+h1 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #444;
+}
+
+/* Date Box Styling */
+.date-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.date-box label {
+    font-size: 0.9rem;
+}
+
+.date-box input {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.date-box button {
+    padding: 5px 15px;
+    border: none;
+    border-radius: 4px;
+    background: #4caf50;
+    color: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.date-box button:hover {
+    background: #45a049;
+}
+
+/* Form Box Styling */
+.form-box {
+    margin: 0 auto;
+    max-width: 600px;
+    flex-shrink: 0;
+}
+
+form div {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.form-control,
+.form-select {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #4caf50;
+}
+
+/* Button Styling */
+.exp-btn {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}

@@ -1,11 +1,15 @@
 const express = require('express');
+require('dotenv').config();
+const { jwtAuthMiddleware } = require('../util/jwt')
 
-const {getExpenses, addExpense, deleteExpense, updateExpense} = require('../controllers/expenseController');
+
+const {getExpenses, addExpense, deleteExpense, updateExpense, searchExpense} = require('../controllers/expenseController');
 const router = express.Router();
 
-router.get('/' , getExpenses);
-router.post('/', addExpense);
-router.delete('/:id' , deleteExpense);
-router.put('/:id', updateExpense);
+router.get('/' , jwtAuthMiddleware, getExpenses);
+router.post('/', jwtAuthMiddleware, addExpense);
+router.delete('/:id' , jwtAuthMiddleware, deleteExpense);
+router.put('/:id', jwtAuthMiddleware, updateExpense);
+router.get('/:date', jwtAuthMiddleware, searchExpense)
 
 module.exports = router;

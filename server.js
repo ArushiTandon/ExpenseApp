@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const sequelize = require('./util/db');
+const passport = require('./auth');
+require('dotenv').config();
+
 
 // routes
 const expenseRoutes = require('./routes/expenseRoutes');
@@ -10,6 +13,8 @@ const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const PORT = 3000;
+
+app.use(passport.initialize());
 
 // middlewares
 app.use(cors());
@@ -24,7 +29,7 @@ app.get('/addExpense', (req, res) => {
 });
 
 app.get('/user', (req, res) => {
-    res.sendFile(path.join(__dirname, 'user.html')); // Ensure this file exists in the root directory
+    res.sendFile(path.join(__dirname, 'user.html')); 
 });
 
 app.use('/user', userRoutes);

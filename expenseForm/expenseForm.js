@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:3000/expenses';
+const apiUrl = 'http://localhost:3000/expense';
 
 async function saveOrUpdate(event) {
     event.preventDefault();
@@ -7,6 +7,7 @@ async function saveOrUpdate(event) {
     const description = event.target.text.value;
     const category = event.target.expense.value;
     const expenseId = event.target.dataset.id;
+    const date = event.target.date;
     
     if (expenseId) {
         // Update Expense
@@ -15,6 +16,7 @@ async function saveOrUpdate(event) {
                 amount,
                 description,
                 category,
+                date,
             });
             event.target.dataset.id = ''; // Clear the ID
         } catch (error) {
@@ -23,7 +25,7 @@ async function saveOrUpdate(event) {
     } else {
         // Add New Expense
         try {
-            await axios.post(apiUrl, { amount, description, category });
+            await axios.post(apiUrl, { amount, description, category, date});
         } catch (error) {
             console.error('Error adding expense:', error);
         }
@@ -32,6 +34,20 @@ async function saveOrUpdate(event) {
     event.target.reset();
     loadExpenses();
 }
+
+async function searchExpense(event) {
+    event.preventDefault();
+  
+    const date = document.getElementById("date").value;
+    try {
+      const response = await axios.get(`${apiUrl}/${date}`);
+     
+      const expenseData = response.data;
+      displayExpense(expenseData);
+    } catch (error) {
+      console.error("CAN'T SEARCH EXPENSE JS:", error);
+    }
+  }
 
 // Fetch and Display Expenses
 async function loadExpenses() {
@@ -45,12 +61,12 @@ async function loadExpenses() {
         expenses.forEach(expense => {
             const listItem = document.createElement('li');
             listItem.className = 'list-group-item';
-            listItem.textContent = `${expense.amount} - ${expense.description} - ${expense.category}`;
+            listItem.textContent = `${expense.amount} - ${expense.description} - ${expense.category} - ${expense.date}`;
 
             // Delete Button
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'Delete';
-            deleteBtn.className = 'btn btn-danger btn-sm ms-2';
+            deleteBtn.className = 'delete-btn';
             deleteBtn.onclick = async () => {
                 try {
                     await axios.delete(`${apiUrl}/${expense.id}`);
@@ -63,12 +79,13 @@ async function loadExpenses() {
             // Edit Button
             const editBtn = document.createElement('button');
             editBtn.textContent = 'Edit';
-            editBtn.className = 'btn btn-secondary btn-sm ms-2';
+            editBtn.className = 'edit-btn';
             editBtn.onclick = () => {
                 document.getElementById('amount').value = expense.amount;
                 document.getElementById('text').value = expense.description;
                 document.getElementById('expense').value = expense.category;
-                document.getElementById('Tracker').dataset.id = expense.id; 
+                document.getElementById('Tracker').dataset.id = expense.id;
+                document.getElementById('date').value = expense.date;
             };
 
             listItem.appendChild(deleteBtn);
@@ -80,8 +97,19 @@ async function loadExpenses() {
     }
 }
 
-// Attach Event Listeners
-document.getElementById('Tracker').addEventListener('submit', saveOrUpdate);
+async function displayExpense (expenseData) {
 
-// Load expenses when the page loads
+    const userListElement = document.getElementById('userList');
+    userListElement.innerHTML = '';
+
+    const listItem = document.createElement('li');
+    listItem.className = 'list-group-item';
+    listItem.textContent = `${expenseData.amount} - ${expenseData.description} - ${expenseData.category} - ${expenseData.date}`;
+
+    userListElement.appendChild(listItem);
+};
+
+// Attach Event Listeners
+// document.getElementById('Tracker').addEventListener('submit', saveOrUpdate);
+
 window.onload = loadExpenses;
