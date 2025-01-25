@@ -35,7 +35,7 @@ app.get('/user', (req, res) => {
 app.use('/user', userRoutes);
 app.use('/expense', expenseRoutes);
 
-sequelize.sync({ force: false })
+sequelize.sync({ alter: true })
     .then(() => {
         console.log('Database synced');
         app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));

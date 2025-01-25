@@ -17,7 +17,7 @@ exports.signUp = async (req, res) => {
 
         const newUser = await User.create({username, email, password});
         console.log('Signup - Password:', password);
-        res.status(201).json({newUser})
+        res.status(201).json({userId: newUser.id})
     } catch (error) {
         console.error('ERROR:', error);
         res.status(400).json({error: 'Error creating user'});
@@ -49,7 +49,11 @@ exports.login = async(req, res) => {
 
         const token = generateToken(payload);
 
-        return res.status(200).json({message: 'Login successful!'});
+        return res.status(200).json({
+            message: 'Login successful!',
+            token: token,
+            redirectUrl: '/addExpense',
+        });
 
     } catch (error) {
         console.error('error:', error);

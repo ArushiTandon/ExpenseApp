@@ -32,8 +32,13 @@ async function login(event) {
     try {
         const response = await axios.post(`${apiUrl}/login`, { username, password });
         console.log('Login Response:', response.data);
-        console.log("User logged in successfully");
-        alert(response.data.message);
+
+        if (response.status === 200) {
+            console.log("User logged in successfully");
+            alert(response.data.message);
+        }
+        window.location.href = "/addExpense";
+          
     } catch (error) {
         console.error("Unable to Login:", error);
     }

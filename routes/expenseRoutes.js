@@ -1,10 +1,9 @@
 const express = require('express');
 require('dotenv').config();
 const { jwtAuthMiddleware } = require('../util/jwt')
-
+const router = express.Router();
 
 const {getExpenses, addExpense, deleteExpense, updateExpense, searchExpense} = require('../controllers/expenseController');
-const router = express.Router();
 
 router.get('/' , jwtAuthMiddleware, getExpenses);
 router.post('/', jwtAuthMiddleware, addExpense);

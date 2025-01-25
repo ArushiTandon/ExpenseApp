@@ -2,7 +2,7 @@ const Expense = require('../models/expense');
 
 exports.getExpenses = async (req, res) => {
     try {
-        const rows = await Expense.findAll();
+        const rows = await Expense.findAll({ where: { userId: req.user.id } });
         res.status(200).json(rows);
     } catch (err) {
         console.error('Error fetching expenses:', err);
@@ -12,8 +12,9 @@ exports.getExpenses = async (req, res) => {
 
 exports.addExpense = async (req, res) => {
     const { amount, description, category, date } = req.body;
+    const userId = req.user.id; //extracting user id from token
     try {
-        const newExpense = await Expense.create({ amount, description, category, date });
+        const newExpense = await Expense.create({ amount, description, category, date, userId });
         res.status(201).json(newExpense);
     } catch (err) {
         console.error('Error adding expense:', err);
@@ -23,8 +24,9 @@ exports.addExpense = async (req, res) => {
 
 exports.deleteExpense = async (req, res) => {
     const { id } = req.params;
+    const userId = req.user.id;
     try {
-        const rowsDeleted = await Expense.destroy({ where: { id } });
+        const rowsDeleted = await Expense.destroy({ where: { id, userId } });
 
         if (!rowsDeleted) {
             return res.status(404).json({ error: 'Expense not found' });
@@ -40,9 +42,10 @@ exports.deleteExpense = async (req, res) => {
 exports.updateExpense = async (req, res) => {
     const { id } = req.params;
     const { amount, description, category, date } = req.body;
+    const userId = req.user.id;
 
     try {
-        const existingExpense = await Expense.findByPk(id);
+        const existingExpense = await Expense.findOne({ where: { id, userId } });
 
         if (!existingExpense) {
             return res.status(404).json({ error: 'Expense not found' });
@@ -59,9 +62,11 @@ exports.updateExpense = async (req, res) => {
 
 exports.searchExpense = async (req, res) => {
     const { date } = req.params;
+    const userId = req.user.id;
+
     
     try {
-        const expense = await Expense.findAll({ where: { date } });
+        const expense = await Expense.findAll({ where: { date, userId } });
         res.status(200).json(expense);
     } catch (err) {
         console.error('Error fetching expenses:', err);
