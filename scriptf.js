@@ -36,8 +36,12 @@ async function login(event) {
         if (response.status === 200) {
             console.log("User logged in successfully");
             alert(response.data.message);
+
+            const token = response.data.token;
+            localStorage.setItem('authToken', token);
+
+            window.location.href = "/addExpense";
         }
-        window.location.href = "/addExpense";
           
     } catch (error) {
         console.error("Unable to Login:", error);

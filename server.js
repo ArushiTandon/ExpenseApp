@@ -6,10 +6,12 @@ const sequelize = require('./util/db');
 const passport = require('./auth');
 require('dotenv').config();
 
-
 // routes
 const expenseRoutes = require('./routes/expenseRoutes');
 const userRoutes = require('./routes/userRoutes');
+const Order = require('./models/order');
+const User = require('./models/User');
+const expense = require('./models/expense');
 
 const app = express();
 const PORT = 3000;
@@ -34,8 +36,16 @@ app.get('/user', (req, res) => {
 
 app.use('/user', userRoutes);
 app.use('/expense', expenseRoutes);
+app.use('/purchase', purchaseRoutes);
 
-sequelize.sync({ alter: true })
+User.hasMany(expense)
+expense.belongsTo(User);
+
+User.hasMany(Order);
+Order.belongsTo(User);
+
+
+sequelize.sync({ force: true })
     .then(() => {
         console.log('Database synced');
         app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
