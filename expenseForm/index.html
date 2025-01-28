@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expense Tracker</title>
     <link rel="stylesheet" href="/expenseForm/expenseForm.css" />
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 </head>
 
 <body>
@@ -61,12 +62,16 @@
             </form>
         </div>
 
-        <div>
+        <div class="premium-box">
             <button id="rzp-btn" onclick="premium(event)">Buy Premium</button>
-            <script src=""></script>
+        </div>
+
+        <div>
+            <button id="Leaderboard-btn" onclick="leaderboardDisplay(event)"></button>
         </div>
 
         <ul id="userList" name="userList" class="userList"></ul>
+        <ul id="leadList" name="leadList" class="leadList"></ul>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

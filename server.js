@@ -7,8 +7,11 @@ const passport = require('./auth');
 require('dotenv').config();
 
 // routes
+const purchaseRoutes = require('./routes/purchaseRoutes')
 const expenseRoutes = require('./routes/expenseRoutes');
 const userRoutes = require('./routes/userRoutes');
+
+// models
 const Order = require('./models/order');
 const User = require('./models/User');
 const expense = require('./models/expense');
@@ -18,8 +21,12 @@ const PORT = 3000;
 
 app.use(passport.initialize());
 
-// middlewares
-app.use(cors());
+var corOptions = {
+    origin: '*'
+}
+
+//middle ware;
+app.use(cors(corOptions))
 app.use(bodyParser.json());
 
 app.use('/expenseForm', express.static(path.join(__dirname, 'expenseForm')));
@@ -38,14 +45,13 @@ app.use('/user', userRoutes);
 app.use('/expense', expenseRoutes);
 app.use('/purchase', purchaseRoutes);
 
-User.hasMany(expense)
-expense.belongsTo(User);
+User.hasMany(expense, { foreignKey: 'userId' });
+expense.belongsTo(User, { foreignKey: 'userId' });
 
-User.hasMany(Order);
-Order.belongsTo(User);
+User.hasMany(Order, { foreignKey: 'userId' });
+Order.belongsTo(User, { foreignKey: 'userId' });
 
-
-sequelize.sync({ force: true })
+sequelize.sync({ alter: true })
     .then(() => {
         console.log('Database synced');
         app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));

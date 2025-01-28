@@ -1,28 +1,35 @@
-const Razorpay = require('razorpay');
+// RAZORPAY
+const Cashfree = require('cashfree-pg'); 
 const Order = require('../models/order');
 
-exports.purchasePremium = async (req, res) => {
-    try {
+Cashfree.XClientId = "CASHFREE_KEYID";
+Cashfree.XClientSecret = "CASHFREE_KEY_SECRET";
+Cashfree.XEnvironment = "https://sandbox.cashfree.com";
+
+// exports.purchasePremium = async (req, res) => {
+
+
+//     try {
         
-        const rzp = new Razorpay({
-            key_id: process.env.RAZORPAY_KEY_ID,
-            key_secret: process.env.RAZORPAY_KEY_SECRET
-        });
+//         const rzp = new Razorpay({
+//             key_id: process.env.RAZORPAY_KEY_ID,
+//             key_secret: process.env.RAZORPAY_KEY_SECRET
+//         });
 
-        const amount = 2500;
-
-        
-        const order = await rzp.orders.create({ amount, currency: "INR" });
+//         const amount = 2500;
 
         
-        await req.user.createOrder({ orderid: order.id, status: 'PENDING' });
+//         const order = await rzp.orders.create({ amount, currency: "INR" });
 
-        return res.status(201).json({ order, key_id: rzp.key_id });
-    } catch (error) {
-        console.error('Error during purchasePremium:', error);
-        return res.status(500).json({ message: 'Failed to initiate purchase. Please try again later.' });
-    }
-};
+        
+//         await req.user.createOrder({ orderid: order.id, status: 'PENDING' });
+
+//         return res.status(201).json({ order, key_id: rzp.key_id });
+//     } catch (error) {
+//         console.error('Error during purchasePremium:', error);
+//         return res.status(500).json({ message: 'Failed to initiate purchase. Please try again later.' });
+//     }
+// };
 
 exports.purchaseStatus = async (req, res) => {
     const { order_id, status } = req.body; 

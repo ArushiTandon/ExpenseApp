@@ -3,16 +3,25 @@ require('dotenv').config();
 
 
 const jwtAuthMiddleware = (req, res, next) => {
+        
+    const authorization = req.headers['x-auth-token'];
+    console.log("1");
     
-    const authorization = req.headers.authorization;
     if(!authorization) return res.status(401).json({error: 'Token not found'});
+console.log("2");
 
-    const token = req.headers.authorization.split(' ')[1];
+    const token = req.headers['x-auth-token'].split(' ')[1];
+    console.log("3");
+    
     if(!token) return res.status(401).json({error: 'Unauthorized'});
+    console.log("4");
+    
 
     try {
-
+        console.log("5");
+        
         const decode = jwt.verify(token, '000');
+        console.log("6");
         req.user = decode;
         next();
 

@@ -1,12 +1,17 @@
+const { Cashfree } = require("cashfree-pg");
 const e = require("express");
-const Razorpay = require("razorpay");
 
-const apiUrl = 'http://localhost:3000/expense';
+const cashfree = Cashfree({
+    mode: "sandbox",
+})
+
 
 async function saveOrUpdate(event) {
     event.preventDefault();
 
-    const token = localStorage.getItem('token');
+    const apiUrl = 'http://localhost:3000/expense';
+
+    const token = localStorage.getItem('authToken');
 
     const amount = event.target.amount.value;
     const description = event.target.text.value;
@@ -21,11 +26,11 @@ async function saveOrUpdate(event) {
     //     console.error('No token found in local storage.');
     //     return;
     // }
+    console.log('Token:', token);
 
     const headers = {
-        Authorization: token,
+        ['x-auth-token']: `Bearer ${token}`,
     };
-
     
     try {
       if (expenseId) {
@@ -39,7 +44,7 @@ async function saveOrUpdate(event) {
             event.target.dataset.id = ''; // Clear the ID
 
         } else {
-                await axios.post(apiUrl, { amount, description, category, date}, {Headers: headers});
+                await axios.post(apiUrl, { amount, description, category, date}, {headers: headers});
                 console.log('Expense added successfully.');
             }
         } catch (error) {
@@ -48,77 +53,71 @@ async function saveOrUpdate(event) {
         }
 
         event.target.reset();
-        loadExpenses();
+        // loadExpenses();
     }
 
 
     async function premium(event) {
-        event.preventDefault(); 
+        event.preventDefault();
     
-        const token = localStorage.getItem('token');
+        const apiUrl = 'http://localhost:3000/expense';
+
         try {
-            const { data } = await axios.get(apiUrl, { headers: { "Authorization": token } });
+            const response = await axios.post(`${apiUrl}/pay`);
+            const resdata = response.data;
     
-            const options = {
-                key: data.key_id,
-                order_id: data.order_id,
-                handler: async function (response) {
-                    try {
-                        // Resolve payment by sending data to the server
-                        const [paymentResponse] = await Promise.all([
-                            axios.post(apiUrl, {
-                                order_id: options.order_id,
-                                payment_id: response.razorpay_payment_id,
-                            }, { headers: { "Authorization": token } })
-                        ]);
+            const paymentSessionId = resdata.paymentSessionId;
+            if (!paymentSessionId) {
+                throw new Error("Payment session ID not found");
+            }
     
-                        alert('You are a premium user Now');
-                        console.log('Payment successful:', paymentResponse.data);
-                    } catch (error) {
-                        console.error('Error in payment processing:', error);
-                        alert('Payment processing failed.');
-                    }
-                }
+            // Configuring payment checkout options
+            let checkoutOptions = {
+                paymentSessionId: paymentSessionId,
+                redirectTarget: "_modal",
             };
     
-            const rzp1 = new Razorpay(options);
+            // Initiating payment using cashfree
+            const result = await cashfree.checkout(checkoutOptions);
+            console.log("Payment process completed");
     
-            // Open Razorpay modal
-            rzp1.open();
+            if (result.error) {
+                console.error("Payment Error:", result.error);
+            } else if (result.redirect) {
+                console.log("Redirect URL:", result.redirect);
+            } else if (result.paymentDetails) {
+                console.log("Payment Message:", result.paymentDetails.paymentMessage);
     
-            // Handle payment failures
-            rzp1.on('payment.failed', async function (response) {
-                console.error('Payment failed:', response);
-    
-                // Update order status to 'FAILED'
-                try {
-                    await axios.post(apiUrl + "/transactionstatus", {
-                        order_id: options.order_id,
-                        status: "FAILED"
-                    }, { headers: { "Authorization": token } });
-    
-                    alert('Transaction failed. Order status updated to FAILED.');
-                } catch (error) {
-                    console.error('Error updating order status:', error);
-                    alert('Failed to update order status.');
+                const orderId = resdata.orderId; 
+                if (!orderId) {
+                    throw new Error("Order ID not found");
                 }
-            });
-        } catch (error) {
-            console.error('Error fetching payment details:', error);
-            alert('Something went wrong while initiating the payment.');
-        }
-    }
     
+                // Sending payment status update
+                const statusResponse = await axios.post(`${apiUrl}/payment-status/${orderId}`);
+                const statusData = statusResponse.data;
+                const payment_status = statusData.orderStatus;
+    
+                alert("Your payment is " + statusData.orderStatus);
+
+                displayPremium(payment_status);
+            }
+        } catch (error) {
+            console.error("Error during purchase:", error);
+        }
+    }   
     
 async function searchExpense(event) {
     event.preventDefault();
+
+    const apiUrl = 'http://localhost:3000/expense';
 
     const token = localStorage.getItem('authToken');
     const date = document.getElementById("date").value;
     try {
       const response = await axios.get(`${apiUrl}/${date}`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                ['x-auth-token']: `Bearer ${token}`,
             },
         });
      
@@ -130,11 +129,13 @@ async function searchExpense(event) {
   }
 
 async function loadExpenses() {
+    const apiUrl = 'http://localhost:3000/expense';
+
     try {
         const token = localStorage.getItem('authToken');
         const response = await axios.get(apiUrl, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                ['x-auth-token']: `Bearer ${token}`,
             },
         });
         const expenses = response.data;
@@ -154,7 +155,7 @@ async function loadExpenses() {
             deleteBtn.onclick = async () => {
                 try {
                     await axios.delete(`${apiUrl}/${expense.id}`, {
-                        headers: { Authorization: `Bearer ${token}` }, // Attach token
+                        headers: { ['x-auth-token']: `Bearer ${token}` }, // Attach token
                     });
                     loadExpenses();
                 } catch (error) {
@@ -183,9 +184,9 @@ async function loadExpenses() {
     }
 }
 
-async function displayExpense (expenseData) {
+async function displayExpense(expenseData) {
 
-    const userListElement = document.getElementById('userList');
+   try { const userListElement = document.getElementById('userList');
     userListElement.innerHTML = '';
 
     const listItem = document.createElement('li');
@@ -193,9 +194,58 @@ async function displayExpense (expenseData) {
     listItem.textContent = `${expenseData.amount} - ${expenseData.description} - ${expenseData.category} - ${expenseData.date}`;
 
     userListElement.appendChild(listItem);
+} catch(error){
+    console.error('Error displaying expense:', error);
+}
 };
+
+async function displayPremium(paymentStatus) {
+
+    try{
+        if (paymentStatus === 'SUCCESS') {
+            const premiumbtn = document.getElementById('rzp-btn');
+            if (premiumbtn) {
+                premiumbtn.remove();
+            }
+            
+            const premiumElement = document.createElement('p');
+            premiumElement.className = 'premium';
+            premiumElement.textContent = 'You are a premium user!';
+            
+            const premiumDiv = document.getElementById('premium-box');
+            if (premiumDiv) {
+                premiumDiv.appendChild(premiumElement);
+            }
+        }
+    } catch (error) {
+        console.error('Error displaying premium:', error);
+    }
+}
+
+async function leaderboardDisplay() {
+    const apiUrl = 'http://localhost:3000/expense';
+
+    try {
+        const response = await axios.get(`${apiUrl}/leaderboard`);
+        const leaderboardData = response.data;
+
+        const leaderboardElement = document.getElementById('leadlist');
+        leaderboardElement.innerHTML =' ';
+        leaderboardData.forEach((user, index) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item';
+            listItem.textContent = `${index + 1}. ${user.name} - ${user.totalExpense}`;
+
+            leaderboardElement.appendChild(listItem);
+        });
+        
+    } catch (error) {
+        console.error('Error loading leaderboard:', error);
+    }
+}
 
 // Attach Event Listeners
 // document.getElementById('Tracker').addEventListener('submit', saveOrUpdate);
 
-window.onload = loadExpenses;
+// window.onload = loadExpenses;
+document.addEventListener('DOMContentLoaded', displayPremium);

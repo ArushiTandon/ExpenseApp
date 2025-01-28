@@ -11,8 +11,13 @@ exports.getExpenses = async (req, res) => {
 };
 
 exports.addExpense = async (req, res) => {
+    console.log("******"); 
+    
     const { amount, description, category, date } = req.body;
     const userId = req.user.id; //extracting user id from token
+
+    console.log("*******:", userId);
+    
     try {
         const newExpense = await Expense.create({ amount, description, category, date, userId });
         res.status(201).json(newExpense);
@@ -44,6 +49,11 @@ exports.updateExpense = async (req, res) => {
     const { amount, description, category, date } = req.body;
     const userId = req.user.id;
 
+    console.log("******");
+    console.log(id);
+    console.log("******");
+    
+    
     try {
         const existingExpense = await Expense.findOne({ where: { id, userId } });
 
@@ -63,7 +73,6 @@ exports.updateExpense = async (req, res) => {
 exports.searchExpense = async (req, res) => {
     const { date } = req.params;
     const userId = req.user.id;
-
     
     try {
         const expense = await Expense.findAll({ where: { date, userId } });
@@ -71,5 +80,16 @@ exports.searchExpense = async (req, res) => {
     } catch (err) {
         console.error('Error fetching expenses:', err);
         res.status(500).json({ error: 'Error fetching expenses' });
+    }
+}
+
+exports.loadExpense = async (req, res) => {
+    
+    try {
+        const expense = await Expense.findAll();
+        res.status(200).json(expense);
+    } catch (err) {
+        console.error('Error loading expenses:', err);
+        res.status(500).json({ error: 'Error loading expenses' });
     }
 }
