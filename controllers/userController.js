@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const Expense = require('../models/expense');
 const { generateToken } = require('../util/jwt');
+const sequelize = require('../util/db');
 
 
 exports.signUp = async (req, res) => {
@@ -59,5 +61,29 @@ exports.login = async(req, res) => {
         console.error('error:', error);
         res.status(400).json({error: 'Error logging in'});
     }
+
+   
+    exports.leaderboard = async (req, res) => {
+        try {
+            const leaderboardData = await User.findAll({
+                attributes: [
+                    "username",
+                    [sequelize.fn("SUM", sequelize.col("Expenses.amount")), "totalexpense"],
+                ],
+                include: [
+                    {
+                        model: Expense,
+                        attributes: [],
+                    },
+                ],
+                group: ["User.id"],
+                order: [[sequelize.literal("totalexpense"), "DESC"]],
+            });
+            res.status(200).json(leaderboardData);
+        } catch (error) {
+            console.error("Error fetching leaderboard:", error);
+            res.status(500).json({ error: "Error fetching leaderboard" });
+        }
+    };
 
 }

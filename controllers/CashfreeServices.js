@@ -1,13 +1,13 @@
-const Cashfree = require('cashfree-pg'); 
-const Order = require("../models/order");
+require('dotenv').config();
+const { Cashfree } = require("cashfree-pg");
 
-Cashfree.XClientId = "CASHFREE_KEYID";
-Cashfree.XClientSecret = "CASHFREE_KEY_SECRET";
-Cashfree.XEnvironment = "TEST";
+    XClientId = "CASHFREE_KEYID",
+    XClientSecret = "CASHFREE_KEY_SECRET",
+    XEnvironment = "TEST",
 
  exports.createOrder = async (req, res) => {
     try {
-        const order_amount = req.body.order_amount; // order_amount is sent in the request
+        const order_amount = req.body.order_amount; 
 
         const request = {
             order_amount: order_amount,
@@ -26,7 +26,9 @@ Cashfree.XEnvironment = "TEST";
             order_expiry_time: "2025-01-28T11:40:07.869Z",
         };
 
-        const response = await Order.PGCreateOrder("2023-08-01", request);
+        console.log(Cashfree.XClientId, Cashfree.XClientSecret);
+
+        const response = await Cashfree.PGCreateOrder("2023-08-01", request);
         const paymentSessionId = response.data.payment_session_id;
 
         res.status(200).json({ paymentSessionId });
@@ -39,7 +41,7 @@ Cashfree.XEnvironment = "TEST";
 // Get Payment Status Function
 exports.getPaymentStatus = async (orderId) => {
     try {
-        const response = await Order.PGOrderFetchPayments("2025-08-01", orderId);
+        const response = await Cashfree.PGOrderFetchPayments("2025-08-01", orderId);
         const getOrderResponse = response.data;
 
         let orderStatus;

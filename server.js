@@ -7,7 +7,7 @@ const passport = require('./auth');
 require('dotenv').config();
 
 // routes
-const purchaseRoutes = require('./routes/purchaseRoutes')
+const purchaseRoutes = require('./routes/purchaseRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const userRoutes = require('./routes/userRoutes');
 
@@ -26,7 +26,7 @@ var corOptions = {
 }
 
 //middle ware;
-app.use(cors(corOptions))
+app.use(cors(corOptions));
 app.use(bodyParser.json());
 
 app.use('/expenseForm', express.static(path.join(__dirname, 'expenseForm')));
@@ -41,9 +41,14 @@ app.get('/user', (req, res) => {
     res.sendFile(path.join(__dirname, 'user.html')); 
 });
 
+// app.get('/premium', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'expenseForm', 'index.html')); 
+// });
+
 app.use('/user', userRoutes);
 app.use('/expense', expenseRoutes);
 app.use('/purchase', purchaseRoutes);
+
 
 User.hasMany(expense, { foreignKey: 'userId' });
 expense.belongsTo(User, { foreignKey: 'userId' });

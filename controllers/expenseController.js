@@ -83,13 +83,13 @@ exports.searchExpense = async (req, res) => {
     }
 }
 
-exports.loadExpense = async (req, res) => {
+// exports.loadExpense = async (req, res) => {
     
-    try {
-        const expense = await Expense.findAll();
-        res.status(200).json(expense);
-    } catch (err) {
-        console.error('Error loading expenses:', err);
-        res.status(500).json({ error: 'Error loading expenses' });
-    }
-}
+//     try {
+//         const expense = await Expense.findAll();
+//         res.status(200).json(expense);
+//     } catch (err) {
+//         console.error('Error loading expenses:', err);
+//         res.status(500).json({ error: 'Error loading expenses' });
+//     }
+// }

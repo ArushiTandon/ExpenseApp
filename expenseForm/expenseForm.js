@@ -59,11 +59,22 @@ async function saveOrUpdate(event) {
 
     async function premium(event) {
         event.preventDefault();
+
+        console.log("****************************************************");
+        
     
-        const apiUrl = 'http://localhost:3000/expense';
+        const apiUrl = 'http://localhost:3000/purchase';
+        const token = localStorage.getItem('authToken');
+
+        console.log("Token being sent:", token);
+
 
         try {
-            const response = await axios.post(`${apiUrl}/pay`);
+            const response = await axios.post(`${apiUrl}/premiummembership`, {}, {  
+                headers: { 'x-auth-token': `Bearer ${token}` }  
+            });
+            
+
             const resdata = response.data;
     
             const paymentSessionId = resdata.paymentSessionId;
@@ -234,7 +245,7 @@ async function leaderboardDisplay() {
         leaderboardData.forEach((user, index) => {
             const listItem = document.createElement('li');
             listItem.className = 'list-group-item';
-            listItem.textContent = `${index + 1}. ${user.name} - ${user.totalExpense}`;
+            listItem.textContent = `${index + 1}. ${user.username} - ${user.totalexpense}`;
 
             leaderboardElement.appendChild(listItem);
         });
