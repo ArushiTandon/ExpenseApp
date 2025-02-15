@@ -1,4 +1,6 @@
 const Expense = require('../models/expense');
+const User = require('../models/User')
+const sequelize = require('../util/db');
 
 exports.getExpenses = async (req, res) => {
     try {
@@ -11,34 +13,66 @@ exports.getExpenses = async (req, res) => {
 };
 
 exports.addExpense = async (req, res) => {
-    console.log("******"); 
+
+    console.log("INSIDE ADD EXPENSE");
     
     const { amount, description, category, date } = req.body;
-    const userId = req.user.id; //extracting user id from token
+    const userId = req.user.id; // Extracting user id from token
 
-    console.log("*******:", userId);
+    console.log("USER ID:", userId);
+
+    const t = sequelize.transaction();
     
     try {
-        const newExpense = await Expense.create({ amount, description, category, date, userId });
-        res.status(201).json(newExpense);
-    } catch (err) {
-        console.error('Error adding expense:', err);
+
+        const result = await sequelize.transaction(async (t) => {
+            const newExpense = await Expense.create(
+                { amount, description, category, date, userId },
+                { transaction: t }
+            );
+
+            const totalExpense = await Expense.sum('amount', { where: { userId }, transaction: t });
+
+            await User.update(
+                { totalexpense: totalExpense },
+                { where: { id: userId }, transaction: t }
+            );
+
+            return newExpense;
+        });
+
+        res.status(201).json(result);
+    } catch (error) {
+        await t.rollback();
+        console.error('Error adding expense:', error);
         res.status(400).json({ error: 'Error adding expense' });
     }
 };
 
+
 exports.deleteExpense = async (req, res) => {
+    const t = await sequelize.transaction();
+
     const { id } = req.params;
     const userId = req.user.id;
     try {
-        const rowsDeleted = await Expense.destroy({ where: { id, userId } });
+        const rowsDeleted = await Expense.destroy({ where: { id, userId }, transaction: t });
 
         if (!rowsDeleted) {
             return res.status(404).json({ error: 'Expense not found' });
         }
 
+        await t.commit();
+        
+        const totalExpense = await Expense.sum('amount', { where: { userId }, transaction: t });
+        await User.update(
+            { totalexpense: totalExpense },
+            { where: { id: userId }, transaction: t }
+        );
+        
         res.status(200).json({ message: 'Expense deleted successfully' });
     } catch (err) {
+        await t.rollback();
         console.error('Error deleting expense:', err);
         res.status(500).json({ error: 'Error deleting expense' });
     }

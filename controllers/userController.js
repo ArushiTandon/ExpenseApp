@@ -8,6 +8,7 @@ const sequelize = require('../util/db');
 exports.signUp = async (req, res) => {
     // console.log('signup Request Body(LoginController):', req.body);
     const {username, email, password} = req.body;
+    const t = await sequelize.transaction();
 
     try {
         const user = await User.findOne({ where: { username } });
@@ -18,9 +19,11 @@ exports.signUp = async (req, res) => {
         }
 
         const newUser = await User.create({username, email, password});
+        await t.commit();
         console.log('Signup - Password:', password);
         res.status(201).json({userId: newUser.id})
     } catch (error) {
+        await yield.rollback();
         console.error('ERROR:', error);
         res.status(400).json({error: 'Error creating user'});
     }
@@ -68,7 +71,7 @@ exports.login = async(req, res) => {
             const leaderboardData = await User.findAll({
                 attributes: [
                     "username",
-                    [sequelize.fn("SUM", sequelize.col("Expenses.amount")), "totalexpense"],
+                    [sequelize.fn("SUM", sequelize.col("Expense.amount")), "totalexpense"],
                 ],
                 include: [
                     {
