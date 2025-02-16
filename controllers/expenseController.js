@@ -40,7 +40,7 @@ exports.addExpense = async (req, res) => {
 
             return newExpense;
         });
-
+        
         res.status(201).json(result);
     } catch (error) {
         await t.rollback();
@@ -87,18 +87,20 @@ exports.updateExpense = async (req, res) => {
     console.log(id);
     console.log("******");
     
+    const t = await sequelize.transaction();
     
     try {
-        const existingExpense = await Expense.findOne({ where: { id, userId } });
+        const existingExpense = await Expense.findOne({ where: { id, userId } , transaction: t });
 
         if (!existingExpense) {
             return res.status(404).json({ error: 'Expense not found' });
         }
 
         await existingExpense.update({ amount, description, category, date });
-
+        await t.commit();
         res.status(200).json({ message: 'Expense updated successfully' });
     } catch (err) {
+        await t.rollback();
         console.error('Error updating expense:', err);
         res.status(500).json({ error: 'Error updating expense' });
     }
