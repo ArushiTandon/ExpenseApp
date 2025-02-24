@@ -1,13 +1,11 @@
 const express = require('express');
-const { signUp, login } = require('../controllers/userController');
+const { signUp, login, getUserInfo } = require('../controllers/userController');
 const router = express.Router();
 const passport = require('../auth');
+const { jwtAuthMiddleware } = require('../util/jwt');
 require('dotenv').config();
 
-
-
 const localAuthMid = passport.authenticate('local', {session: false});
-
 
 // Create a new user
 router.post('/signup', signUp);
@@ -15,5 +13,7 @@ router.post('/signup', signUp);
 // Login
 router.post('/login', localAuthMid, login);
 
+// UserInfo
+router.get('/userinfo', jwtAuthMiddleware, getUserInfo);
 
 module.exports = router;

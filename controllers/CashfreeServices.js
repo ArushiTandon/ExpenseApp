@@ -1,49 +1,111 @@
 require('dotenv').config();
 const { Cashfree } = require("cashfree-pg");
+const { v4: uuidv4 } = require("uuid");
+const Order = require("../models/order");
+const User = require('../models/User');
+const axios = require('axios');
+const jwt = require('jsonwebtoken');
+const path = require('path');
 
-    XClientId = "CASHFREE_KEYID",
-    XClientSecret = "CASHFREE_KEY_SECRET",
-    XEnvironment = "TEST",
 
- exports.createOrder = async (req, res) => {
-    try {
-        const order_amount = req.body.order_amount; 
+
+Cashfree.XClientId = process.env.CASHFREE_KEYID;
+Cashfree.XClientSecret = process.env.CASHFREE_KEY_SECRET;
+Cashfree.XEnvironment = "TEST";
+
+
+exports.createOrder = async (req, res) => {
+    
+    const expiryDate = new Date(Date.now() + 60 * 60 * 1000).toISOString(); //1 hour expiry time
+    
+    const orderId = `order_${uuidv4()}`;
+
+     try {
 
         const request = {
-            order_amount: order_amount,
+            order_amount: 2500,
             order_currency: "INR",
-            order_id: "devstudio_83855830",
+            order_id: orderId,
             customer_details: {
                 customer_id: "devstudio_user",
-                customer_phone: "8474090589",
+                customer_phone: "8474770589",
             },
             order_meta: {
-                return_url: "http://localhost:3000/expense/transactionstatus?order_id={order_id}",
-                notify_url: "", // Optional
-
+                return_url: `http://localhost:3000/purchase/orderStatus/${orderId}`, 
+                
                 payment_methods: "cc,dc,upi",
             },
-            order_expiry_time: "2025-01-28T11:40:07.869Z",
+            order_expiry_time: expiryDate,
         };
 
-        console.log(Cashfree.XClientId, Cashfree.XClientSecret);
+        // console.log(Cashfree.XClientId, Cashfree.XClientSecret);
+
+        // console.log("Request being sent to Cashfree:", request);
 
         const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+        
+
         const paymentSessionId = response.data.payment_session_id;
 
-        res.status(200).json({ paymentSessionId });
+        if (!paymentSessionId) {
+            console.error("Payment session ID is missing!");
+            return;
+        }
+        
+        console.log("Order Created successfully:", response.data);
+
+        await Order.create({
+            paymentid: paymentSessionId,
+            orderid: orderId,
+            status: "PENDING",
+        });
+
+       return res.status(200).json({ paymentSessionId , orderId });
     } catch (error) {
         console.error("Error creating order:", error.message);
         res.status(500).json({ error: "Error creating order" });
     }
 };
 
+exports.transactionStatus = async (req, res) => {
+    const orderId = req.params.orderId;
+    const token = req.query.token;
+    // const decoded = jwt.verify(token, process.env.JWT_SECRET); 
+    const userId = req.user.id; 
+    const { order_amount } = req.body;
+
+    console.log("INSIDE TRANSACTION STATUS API:", orderId);  
+    
+
+    try {
+      const orderStatus = await exports.getPaymentStatus(orderId);
+
+      if (orderStatus === 'SUCCESS') {
+
+       await User.update(
+          { isPremium: true },
+          { where: { id: userId } }
+        );
+
+      }
+
+      return res.status(200).json({ orderId, orderStatus });
+
+    } catch (error) {
+      console.error("Error fetching transaction status:", error.message);
+      res.status(500).json({ error: "Error fetching transaction status" });
+    }
+  };
+  
 // Get Payment Status Function
 exports.getPaymentStatus = async (orderId) => {
     try {
-        const response = await Cashfree.PGOrderFetchPayments("2025-08-01", orderId);
+
+        const response = await Cashfree.PGOrderFetchPayments("2023-08-01", orderId);
         const getOrderResponse = response.data;
 
+        console.log(getOrderResponse.length);
+        
         let orderStatus;
 
         if (
@@ -62,9 +124,57 @@ exports.getPaymentStatus = async (orderId) => {
             orderStatus = "FAILURE";
         }
 
+        await Order.update(
+            { status: orderStatus },
+            { where: { orderid: orderId } }
+        );
+
         return orderStatus;
     } catch (error) {
         console.error("Error fetching order status:", error.message);
         throw error; 
     }
 };
+
+exports.orderStatus = async (req, res) => {
+    const orderId = req.params.orderId;
+    // You might want to do some server-side logging or processing here.
+    console.log('Serving orderStatus page for Order ID:', orderId);
+
+    // Send the HTML page that includes client-side code (orderStatus.js)
+    res.sendFile(path.join(__dirname, '..', 'Cashfreeservices', 'orderStatus.html'));
+};
+
+// exports.orderStatus = async (req, res) => {
+//     const orderId = req.params.orderId;
+//     // const token = req.query.token; // Extract token from query parameters
+
+//     try {
+//         // // Verify the token
+//         // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//         // const userId = decoded.id;
+
+//         // Call the transactionStatus API
+//         // const response = await axios.get(`http://localhost:3000/purchase/transactionstatus/${orderId}`, {
+//         //     headers: {
+//         //         "x-auth-token": `Bearer ${token}`
+//         //     }
+//         // });
+
+//         // const orderStatus = response.data.orderStatus;
+        
+//         return res.status(200).send({ success: true, orderId: orderId});
+
+
+//     } catch (error) {
+//         console.error('Error:', error.message);
+//         return res.status(500).send('Error processing your order.');
+//     }
+// };
+
+
+// if (payment_status === "SUCCESS") {
+//     window.location.href = "http://localhost:3000/addExpense";
+//   } else {
+//     alert("Payment was not successful. Please try again.");
+//   }

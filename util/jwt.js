@@ -20,7 +20,7 @@ console.log("2");
     try {
         console.log("5");
         
-        const decode = jwt.verify(token, '000');
+        const decode = jwt.verify(token,  process.env.JWT_SECRET);
         console.log("6");
         req.user = decode;
         next();
@@ -33,6 +33,6 @@ console.log("2");
 }
 
 const generateToken = (user) => {
-    return jwt.sign(user,'000');
+    return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '24h' });
 }
 module.exports = { jwtAuthMiddleware, generateToken};

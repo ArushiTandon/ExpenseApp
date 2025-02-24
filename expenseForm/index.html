@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Expense Tracker</title>
-    <link rel="stylesheet" href="/expenseForm/expenseForm.css" />
-    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Expense Tracker</title>
+        <link rel="stylesheet" href="/expenseForm/expenseForm.css"/>
+        <script src="https://sdk.cashfree.com/js/v3/cashfree.js" ></script>
 </head>
 
 <body>
     <div class="container">
         <h1>Expense Tracker</h1>
-
+        
         <div class="date-box">
             <div>
                 <label for="date" class="form-label">Select A Date:</label>
@@ -35,13 +35,13 @@
                         <input type="number" name="amount" id="amount" class="form-control" required />
                     </div>
                 </div>
-
+                
                 <div>
                     <label for="text" class="form-label">Description:</label>
                     <input type="text" name="text" id="text" class="form-control" placeholder="Description here"
-                        required />
+                    required />
                 </div>
-
+                
                 <div>
                     <label for="expense" class="form-label">Category:</label>
                     <select name="expense" id="expense" class="form-select">
@@ -53,7 +53,7 @@
                         <option value="Others">Others</option>
                     </select>
                 </div>
-
+                
                 <div>
                     <label>
                         <button type="submit" class="exp-btn">Add Expense</button>
@@ -61,19 +61,22 @@
                 </div>
             </form>
         </div>
-
+        
         <div class="premium-box">
-            <button id="rzp-btn" onclick="premium(event)">Buy Premium</button>
+            <button id="premium-btn" onclick="premium(event)">Buy Premium</button>
+            
         </div>
+
+        <div id="payment-container"></div>
 
         <div>
             <button id="Leaderboard-btn" onclick="leaderboardDisplay(event)"></button>
         </div>
-
+        
         <ul id="userList" name="userList" class="userList"></ul>
         <ul id="leadList" name="leadList" class="leadList"></ul>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/expenseForm/expenseForm.js"></script>
 </body>

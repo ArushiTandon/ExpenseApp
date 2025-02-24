@@ -1,12 +1,11 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
-const Expense = require('../models/expense');
 const { generateToken } = require('../util/jwt');
 const sequelize = require('../util/db');
 
 
 exports.signUp = async (req, res) => {
-    // console.log('signup Request Body(LoginController):', req.body);
+    console.log('signup Request Body(LoginController):');
     const {username, email, password} = req.body;
     const t = await sequelize.transaction();
 
@@ -34,8 +33,15 @@ exports.login = async(req, res) => {
     const {username, password} = req.body;
     
     try {
+        
         const user = await User.findOne({ where: { username } });
         console.log('Found User:', user);
+
+        if (!user) {
+            console.log('Invalid username or password');
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+
         console.log('Login - Stored Hash:', user.password);
         console.log('Login - Password Match:', await bcrypt.compare(password, user.password));
 
@@ -64,29 +70,19 @@ exports.login = async(req, res) => {
         console.error('error:', error);
         res.status(400).json({error: 'Error logging in'});
     }
-
-   
-    exports.leaderboard = async (req, res) => {
-        try {
-            const leaderboardData = await User.findAll({
-                attributes: [
-                    "username",
-                    [sequelize.fn("SUM", sequelize.col("Expense.amount")), "totalexpense"],
-                ],
-                include: [
-                    {
-                        model: Expense,
-                        attributes: [],
-                    },
-                ],
-                group: ["User.id"],
-                order: [[sequelize.literal("totalexpense"), "DESC"]],
-            });
-            res.status(200).json(leaderboardData);
-        } catch (error) {
-            console.error("Error fetching leaderboard:", error);
-            res.status(500).json({ error: "Error fetching leaderboard" });
-        }
-    };
-
 }
+
+exports.getUserInfo = async (req, res) => {
+    const userId = req.user.id;
+    
+    try {
+      const user = await User.findByPk(userId, {
+        attributes: ['id', 'username', 'email', 'isPremium'],
+      });
+      res.status(200).json(user);
+    } catch (error) {
+      console.error('Error fetching user info:', error.message);
+      res.status(500).json({ error: 'Failed to fetch user info' });
+    }
+  };
+  

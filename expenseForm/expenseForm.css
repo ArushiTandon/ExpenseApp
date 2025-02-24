@@ -100,3 +100,14 @@ form div {
     padding: 8px 15px;
     font-size: 0.9rem;
 }
+
+.premium-message {
+    background-color: gold;
+    color: #333;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  

@@ -10,11 +10,13 @@ require('dotenv').config();
 const purchaseRoutes = require('./routes/purchaseRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const userRoutes = require('./routes/userRoutes');
+const passwordRoutes = require('./routes/passwordRoutes');
 
 // models
 const Order = require('./models/order');
 const User = require('./models/User');
 const expense = require('./models/expense');
+const Password = require('./models/password');
 
 const app = express();
 const PORT = 3000;
@@ -41,13 +43,11 @@ app.get('/user', (req, res) => {
     res.sendFile(path.join(__dirname, 'user.html')); 
 });
 
-// app.get('/premium', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'expenseForm', 'index.html')); 
-// });
-
+app.use('/Cashfreeservices', express.static(path.join(__dirname, 'Cashfreeservices')));
 app.use('/user', userRoutes);
 app.use('/expense', expenseRoutes);
 app.use('/purchase', purchaseRoutes);
+app.use('/password', passwordRoutes);
 
 
 User.hasMany(expense, { foreignKey: 'userId' });
@@ -56,7 +56,10 @@ expense.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(Order, { foreignKey: 'userId' });
 Order.belongsTo(User, { foreignKey: 'userId' });
 
-sequelize.sync({ alter: true })
+User.hasMany(Password, { foreignKey: 'userId' });
+Password.belongsTo(User, { foreignKey: 'userId' });
+
+sequelize.sync({ alter: false })
     .then(() => {
         console.log('Database synced');
         app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));

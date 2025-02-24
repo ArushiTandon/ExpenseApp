@@ -26,6 +26,7 @@ const expense = sequelize.define('Expense', {
 
     totalexpense: {
         type: DataTypes.INTEGER,
+        allowNull: false,
         defaultValue: 0,
     },
 

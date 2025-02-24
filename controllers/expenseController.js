@@ -40,7 +40,7 @@ exports.addExpense = async (req, res) => {
 
             return newExpense;
         });
-        
+        await t.commit();
         res.status(201).json(result);
     } catch (error) {
         await t.rollback();
@@ -83,10 +83,6 @@ exports.updateExpense = async (req, res) => {
     const { amount, description, category, date } = req.body;
     const userId = req.user.id;
 
-    console.log("******");
-    console.log(id);
-    console.log("******");
-    
     const t = await sequelize.transaction();
     
     try {
@@ -118,6 +114,29 @@ exports.searchExpense = async (req, res) => {
         res.status(500).json({ error: 'Error fetching expenses' });
     }
 }
+
+exports.leaderboard = async (req, res) => {
+    try {
+        const leaderboardData = await User.findAll({
+            attributes: [
+                "username",
+                [sequelize.fn("SUM", sequelize.col("Expense.amount")), "totalexpense"],
+            ],
+            include: [
+                {
+                    model: Expense,
+                    attributes: [],
+                },
+            ],
+            group: ["User.id"],
+            order: [[sequelize.literal("totalexpense"), "DESC"]],
+        });
+        res.status(200).json(leaderboardData);
+    } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+        res.status(500).json({ error: "Error fetching leaderboard" });
+    }
+};
 
 // exports.loadExpense = async (req, res) => {
     
