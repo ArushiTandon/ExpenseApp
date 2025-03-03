@@ -39,6 +39,10 @@ const expense = sequelize.define('Expense', {
         },
         onDelete: 'CASCADE',
     },
+},
+{
+    timestamps: false,
+    tableName: 'expenses',
 });
 
 

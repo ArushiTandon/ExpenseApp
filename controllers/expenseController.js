@@ -13,15 +13,13 @@ exports.getExpenses = async (req, res) => {
 };
 
 exports.addExpense = async (req, res) => {
-
-    console.log("INSIDE ADD EXPENSE");
     
     const { amount, description, category, date } = req.body;
     const userId = req.user.id; // Extracting user id from token
 
     console.log("USER ID:", userId);
 
-    const t = sequelize.transaction();
+    const t = await sequelize.transaction();
     
     try {
 
@@ -62,7 +60,6 @@ exports.deleteExpense = async (req, res) => {
             return res.status(404).json({ error: 'Expense not found' });
         }
 
-        await t.commit();
         
         const totalExpense = await Expense.sum('amount', { where: { userId }, transaction: t });
         await User.update(
@@ -70,6 +67,7 @@ exports.deleteExpense = async (req, res) => {
             { where: { id: userId }, transaction: t }
         );
         
+        await t.commit();
         res.status(200).json({ message: 'Expense deleted successfully' });
     } catch (err) {
         await t.rollback();
@@ -102,25 +100,25 @@ exports.updateExpense = async (req, res) => {
     }
 };
 
-exports.searchExpense = async (req, res) => {
-    const { date } = req.params;
-    const userId = req.user.id;
+// exports.searchExpense = async (req, res) => {
+//     const { date } = req.params;
+//     const userId = req.user.id;
     
-    try {
-        const expense = await Expense.findAll({ where: { date, userId } });
-        res.status(200).json(expense);
-    } catch (err) {
-        console.error('Error fetching expenses:', err);
-        res.status(500).json({ error: 'Error fetching expenses' });
-    }
-}
+//     try {
+//         const expense = await Expense.findAll({ where: { date, userId } });
+//         res.status(200).json(expense);
+//     } catch (err) {
+//         console.error('Error fetching expenses:', err);
+//         res.status(500).json({ error: 'Error fetching expenses' });
+//     }
+// }
 
 exports.leaderboard = async (req, res) => {
     try {
         const leaderboardData = await User.findAll({
             attributes: [
                 "username",
-                [sequelize.fn("SUM", sequelize.col("Expense.amount")), "totalexpense"],
+                [sequelize.fn("SUM", sequelize.col("expenses.amount")), "totalexpense"],
             ],
             include: [
                 {

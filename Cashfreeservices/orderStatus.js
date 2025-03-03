@@ -6,20 +6,25 @@ async function transactionStatus() {
 
     try {
 
+      console.log("ORDER ID TS: ", orderId);
+
       const statusresponse = await axios.get(`http://localhost:3000/purchase/transactionstatus/${orderId}`, {
+
         headers: {
            "x-auth-token": `Bearer ${token}`
         },
       });
 
-      // const orderStatusElement = document.getElementById("orderStatusP");
-      
-    
-      // if (payment_status === "SUCCESS") {
-      //   window.location.href = "http://localhost:3000/addExpense";
-      // } else {
-      //   alert("Payment was not successful. Please try again.");
-      // }
+      const payment_status = statusresponse.data.orderStatus;
+
+      const orderStatusElement = document.getElementById("orderStatusP");
+      orderStatusElement.innerHTML = statusresponse.data.orderStatus;
+
+      if (payment_status === "SUCCESS") {
+        window.location.href = "http://localhost:3000/addExpense";
+      } else {
+        alert("Payment was not successful. Please try again.");
+      }
 
     } catch (error) {
       console.error("Error during purchase:", error);

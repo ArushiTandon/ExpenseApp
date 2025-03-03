@@ -2,8 +2,6 @@ const cashfree = Cashfree({
   mode: "sandbox",
 });
 
-console.log(cashfree);
-
 async function saveOrUpdate(event) {
   event.preventDefault();
 
@@ -15,9 +13,7 @@ async function saveOrUpdate(event) {
   const description = event.target.text.value;
   const category = event.target.expense.value;
   const expenseId = event.target.dataset.id;
-  const date = event.target.date;
-
-  console.log("Token:", token);
+  const date = document.getElementById("date").value;
 
   const headers = {
     ["x-auth-token"]: `Bearer ${token}`,
@@ -50,7 +46,7 @@ async function saveOrUpdate(event) {
   }
 
   event.target.reset();
-  // loadExpenses();
+  loadExpenses();
 }
 
 async function premium(event) {
@@ -88,39 +84,6 @@ async function premium(event) {
     console.log("Cashfree checkout completed!", result);
     console.log("Payment process completed");
 
-    // if (result.error) {
-    //   console.error("Payment Error:", result.error);
-    // } else if (result.redirect) {
-    //   console.log("Redirect URL:", result.redirect);
-    // } else if (result.paymentDetails) {
-    //   console.log("Payment Message:", result.paymentDetails.paymentMessage);
-
-    //   const orderId = resdata.orderId;
-    //   if (!orderId) {
-    //     throw new Error("Order ID not found");
-    //   }
-
-    //   const statusResponse = await axios.get(
-    //     `${apiUrl}/transactionstatus/${orderId}`,
-    //     {
-    //       headers: { "x-auth-token": `Bearer ${token}` },
-    //     }
-    //   );
-    //   console.log(statusResponse);
-
-    //   // Sending payment status update
-
-    //   const statusData = statusResponse.data;
-    //   const payment_status = statusData.orderStatus;
-
-    //   alert("Your payment is " + payment_status);
-
-    //   if (payment_status === "SUCCESS") {
-    //     window.location.href = "http://localhost:3000/addExpense";
-    //   } else {
-    //     alert("Payment was not successful. Please try again.");
-    //   }
-
       fetchUserInfo(token);
     
   } catch (error) {
@@ -128,26 +91,26 @@ async function premium(event) {
   }
 }
 
-async function searchExpense(event) {
-  event.preventDefault();
+// async function searchExpense(event) {
+//   event.preventDefault();
 
-  const apiUrl = "http://localhost:3000/expense";
+//   const apiUrl = "http://localhost:3000/expense";
 
-  const token = localStorage.getItem("authToken");
-  const date = document.getElementById("date").value;
-  try {
-    const response = await axios.get(`${apiUrl}/${date}`, {
-      headers: {
-        ["x-auth-token"]: `Bearer ${token}`,
-      },
-    });
+//   const token = localStorage.getItem("authToken");
+//   const date = document.getElementById("date").value;
+//   try {
+//     const response = await axios.get(`${apiUrl}/${date}`, {
+//       headers: {
+//         ["x-auth-token"]: `Bearer ${token}`,
+//       },
+//     });
 
-    const expenseData = response.data;
-    displayExpense(expenseData);
-  } catch (error) {
-    console.error("CAN'T SEARCH EXPENSE JS:", error);
-  }
-}
+//     const expenseData = response.data;
+//     displayExpense(expenseData);
+//   } catch (error) {
+//     console.error("CAN'T SEARCH EXPENSE JS:", error);
+//   }
+// }
 
 async function loadExpenses() {
   const apiUrl = "http://localhost:3000/expense";
@@ -161,18 +124,39 @@ async function loadExpenses() {
     });
     const expenses = response.data;
 
-    const userListElement = document.getElementById("userList");
-    userListElement.innerHTML = "";
+    const expenseListTableElement = document.getElementById("expenseListTable");
 
-    expenses.forEach((expense) => {
-      const listItem = document.createElement("li");
-      listItem.className = "list-group-item";
-      listItem.textContent = `${expense.amount} - ${expense.description} - ${expense.category} - ${expense.date}`;
+    expenseListTableElement.innerHTML = "";
+
+    expenses.forEach((expense, index) => {
+
+      
+      const tr = document.createElement("tr");
+      const th = document.createElement("th");
+      const td1 = document.createElement("td");
+      const td2 = document.createElement("td");
+      const td3 = document.createElement("td");
+      const td4 = document.createElement("td");
+      const td5 = document.createElement("td");
+      th.scope = "row";
+      th.textContent = index + 1;
+      td1.textContent = expense.description;
+      td2.textContent = expense.category;
+      td3.textContent = expense.amount;
+      td4.textContent = expense.date;
+    
+      
+      tr.appendChild(th);
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      tr.appendChild(td3);
+      tr.appendChild(td4);
+      
 
       // Delete Button
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "Delete";
-      deleteBtn.className = "delete-btn";
+      deleteBtn.className = "delete-btn btn btn-danger";
       deleteBtn.onclick = async () => {
         try {
           await axios.delete(`${apiUrl}/${expense.id}`, {
@@ -187,7 +171,7 @@ async function loadExpenses() {
       // Edit Button
       const editBtn = document.createElement("button");
       editBtn.textContent = "Edit";
-      editBtn.className = "edit-btn";
+      editBtn.className = "edit-btn btn btn-primary";
       editBtn.onclick = () => {
         document.getElementById("amount").value = expense.amount;
         document.getElementById("text").value = expense.description;
@@ -196,9 +180,11 @@ async function loadExpenses() {
         document.getElementById("date").value = expense.date;
       };
 
-      listItem.appendChild(deleteBtn);
-      listItem.appendChild(editBtn);
-      userListElement.appendChild(listItem);
+      td5.appendChild(deleteBtn);
+      td5.appendChild(editBtn);
+      tr.appendChild(td5);
+      expenseListTableElement.appendChild(tr);
+
     });
   } catch (error) {
     console.error("Error loading expenses:", error);
@@ -228,9 +214,9 @@ function displayPremiumMessage() {
   }
 
   // Display the premium user message
-  const premiumBox = document.querySelector(".premium-box");
+  const premiumBox = document.querySelector("#expenseFormHeader");
   if (premiumBox) {
-    premiumBox.innerHTML += `<p class="premium-message">🎉 Congratulations, you are now a premium user!</p>`;
+    premiumBox.innerHTML += `<button type="button" class="btn fw-bold btn-primary">Premium</button>`;
   }
 }
 
@@ -238,11 +224,6 @@ function displayBuyPremiumButton() {
   const premiumBtn = document.getElementById("premium-btn");
   if (premiumBtn) {
     premiumBtn.style.display = "block";
-  }
-
-  const premiumMessage = document.querySelector(".premium-message");
-  if (premiumMessage) {
-    premiumMessage.remove();
   }
 }
 
@@ -277,7 +258,9 @@ async function leaderboardDisplay(event) {
     const userResponse = await axios.get(
       "http://localhost:3000/user/userinfo",
       {
-        headers: { "x-auth-token": `Bearer ${token}` },
+        headers: {
+          ["x-auth-token"]: `Bearer ${token}`,
+        },
       }
     );
     const user = userResponse.data;
@@ -289,7 +272,9 @@ async function leaderboardDisplay(event) {
 
     // Fetch leaderboard data
     const response = await axios.get(`${apiUrl}/leaderboard`, {
-      headers: { "x-auth-token": `Bearer ${token}` },
+      headers: {
+        ["x-auth-token"]: `Bearer ${token}`,
+      },
     });
     const leaderboardData = response.data;
 
@@ -301,8 +286,9 @@ async function leaderboardDisplay(event) {
       listItem.textContent = `${index + 1}. ${user.username} - ${
         user.totalexpense
       }`;
+      leaderboardElement.appendChild(listItem);
     });
-    leaderboardElement.appendChild(listItem);
+    
   } catch (error) {
     console.error("Error loading leaderboard:", error);
   }

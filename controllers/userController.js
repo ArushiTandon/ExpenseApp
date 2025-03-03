@@ -22,7 +22,7 @@ exports.signUp = async (req, res) => {
         console.log('Signup - Password:', password);
         res.status(201).json({userId: newUser.id})
     } catch (error) {
-        await yield.rollback();
+        await t.rollback();
         console.error('ERROR:', error);
         res.status(400).json({error: 'Error creating user'});
     }

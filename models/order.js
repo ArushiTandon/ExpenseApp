@@ -11,6 +11,9 @@ const Order = sequelize.define('order', {
     paymentid: DataTypes.STRING,
     orderid: DataTypes.STRING,
     status: DataTypes.STRING
-})
+},
+{
+    timestamps: false
+});
 
 module.exports = Order;

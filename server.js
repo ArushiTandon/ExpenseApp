@@ -11,6 +11,7 @@ const purchaseRoutes = require('./routes/purchaseRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const userRoutes = require('./routes/userRoutes');
 const passwordRoutes = require('./routes/passwordRoutes');
+const reportRoutes = require('./routes/viewreportRoutes');
 
 // models
 const Order = require('./models/order');
@@ -48,6 +49,7 @@ app.use('/user', userRoutes);
 app.use('/expense', expenseRoutes);
 app.use('/purchase', purchaseRoutes);
 app.use('/password', passwordRoutes);
+app.use('/report', reportRoutes);
 
 
 User.hasMany(expense, { foreignKey: 'userId' });

@@ -2,34 +2,35 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../util/db');
 const bcrypt = require('bcrypt');
 
-const User = sequelize.define('User', {
-    username: {
-        type: DataTypes.STRING,
-        unique: true,
-        allowNull: false,
-    },
-
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {
-            isEmail: true
+const User = sequelize.define(
+    'User',
+    {
+        username: {
+            type: DataTypes.STRING,
+            unique: true,
+            allowNull: false,
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+            validate: {
+                isEmail: true,
+            },
+        },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        isPremium: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
         },
     },
-
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-
-    isPremium: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    },
-
-});
-
+    {
+        timestamps: false,
+    }
+);
 
 User.beforeCreate(async (user) => {
     user.password = await bcrypt.hash(user.password, 10);
