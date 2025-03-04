@@ -6,6 +6,10 @@ const { startOfDay, startOfWeek, startOfMonth } = require("date-fns");
 
 exports.viewReport = async (req, res) => {
 
+    let { page = 1, limit = 10 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
     try {
         
         const reportType = req.params.reportType;
@@ -27,12 +31,20 @@ exports.viewReport = async (req, res) => {
             return res.status(400).json({ error: 'Invalid report type' });
         }
 
+        const totalExpenses = await Expense.count({ where: condition });
+
         const expenses = await Expense.findAll({
             where: condition,
-            order: [["date", "DESC"]], // Sort by latest expenses
+            order: [["date", "DESC"]],
+            limit: limit, // Limit per page
+            offset: (page - 1) * limit,
         });
 
-        res.status(200).json(expenses);
+        res.status(200).json({
+            expenses,
+            totalPages: Math.ceil(totalExpenses / limit),
+            currentPage: page,
+        });
 
     } catch (error) {
         console.error("Error fetching expenses:", error);
