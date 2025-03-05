@@ -1,8 +1,8 @@
 let currentPage = 1;
 const expensesPerPage = 10;
 
-async function viewExpense(event, page = 1) {
-    const reportType = event.target ? event.target.value : document.querySelector("input[name='reportType']:checked")?.value;
+async function viewExpense(event = null, page = 1) {
+    const reportType = event?.target?.value || document.querySelector("input[name='reportType']:checked")?.value;
     if (!reportType) return;
 
     const apiUrl = `http://localhost:3000/report/${reportType}?page=${page}&limit=${expensesPerPage}`;
@@ -32,7 +32,7 @@ async function viewExpense(event, page = 1) {
                     <td>${(page - 1) * expensesPerPage + (index + 1)}</td>
                     <td>${expense.description}</td>
                     <td>${expense.category}</td>
-                    <td>$${expense.amount}</td>
+                    <td>${expense.amount}</td>
                     <td>${expense.date}</td>
                 </tr>
             `;
@@ -43,23 +43,25 @@ async function viewExpense(event, page = 1) {
         // Pagination Controls
         paginationElement.innerHTML = "";
         if (totalPages > 1) {
+            let paginationHTML = `<nav><ul class="pagination justify-content-center">`;
+
             if (page > 1) {
-                paginationElement.innerHTML += `<button onclick="viewExpense(null, ${page - 1})">Previous</button>`;
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="viewExpense(null, ${page - 1})">Previous</a></li>`;
             }
 
-            paginationElement.innerHTML = `
-    <nav>
-        <ul class="pagination">
-            ${page > 1 ? `<li class="page-item"><a class="page-link" href="#" onclick="viewExpense(null, ${page - 1})">Previous</a></li>` : ""}
-            <li class="page-item disabled"><span class="page-link">Page ${page} of ${totalPages}</span></li>
-            ${page < totalPages ? `<li class="page-item"><a class="page-link" href="#" onclick="viewExpense(null, ${page + 1})">Next</a></li>` : ""}
-        </ul>
-    </nav>
-`;
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHTML += `
+                    <li class="page-item ${i === page ? "active" : ""}">
+                        <a class="page-link" href="#" onclick="viewExpense(null, ${i})">${i}</a>
+                    </li>`;
+            }
 
             if (page < totalPages) {
-                paginationElement.innerHTML += `<button onclick="viewExpense(null, ${page + 1})">Next</button>`;
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="viewExpense(null, ${page + 1})">Next</a></li>`;
             }
+
+            paginationHTML += `</ul></nav>`;
+            paginationElement.innerHTML = paginationHTML;
         }
 
         currentPage = page;
@@ -70,5 +72,8 @@ async function viewExpense(event, page = 1) {
 }
 
 document.querySelectorAll("input[name='reportType']").forEach(radio => {
-    radio.addEventListener("change", viewExpense);
+    radio.addEventListener("change", (event) => {
+        currentPage = 1; 
+        viewExpense(event, currentPage);
+    });
 });

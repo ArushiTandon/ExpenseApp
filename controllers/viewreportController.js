@@ -18,15 +18,15 @@ exports.viewReport = async (req, res) => {
 
         //Date ranges
         const today = startOfDay(new Date());
-        const startOfWeekDate = startOfWeek(new Date());
+        const startOfWeekDate = startOfWeek(new Date(), { weekStartsOn: 1 });
         const startOfMonthDate = startOfMonth(new Date());
 
         if (reportType === "daily") {
             condition.date = { [Op.gte]: today };
         } else if (reportType === "weekly") {
-            condition.date = { [Op.between]: [startOfWeekDate, today] };
+            condition.date = { [Op.gte]: startOfWeekDate };
         } else if (reportType === "monthly") {
-            condition.date = { [Op.between]: [startOfMonthDate, today] };
+            condition.date = { [Op.gte]: startOfMonthDate };
         } else {
             return res.status(400).json({ error: 'Invalid report type' });
         }
@@ -42,6 +42,7 @@ exports.viewReport = async (req, res) => {
 
         res.status(200).json({
             expenses,
+            totalExpenses,
             totalPages: Math.ceil(totalExpenses / limit),
             currentPage: page,
         });
