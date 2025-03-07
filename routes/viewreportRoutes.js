@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { jwtAuthMiddleware } = require('../util/jwt')
+const { jwtAuthMiddleware } = require('../middlewares/jwt')
 const { viewReport } = require('../controllers/viewreportController');
 
 router.get('/:reportType', jwtAuthMiddleware, viewReport);

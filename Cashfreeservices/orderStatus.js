@@ -6,8 +6,6 @@ async function transactionStatus() {
 
     try {
 
-      console.log("ORDER ID TS: ", orderId);
-
       const statusresponse = await axios.get(`http://localhost:3000/purchase/transactionstatus/${orderId}`, {
 
         headers: {

@@ -1,6 +1,6 @@
 const express = require('express');
 const CashfreeServices = require('../controllers/CashfreeServices')
-const { jwtAuthMiddleware } = require("../util/jwt");
+const { jwtAuthMiddleware } = require("../middlewares/jwt");
 
 
 const router = express.Router();

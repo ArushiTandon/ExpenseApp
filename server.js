@@ -1,9 +1,12 @@
 const express = require('express');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const sequelize = require('./util/db');
-const passport = require('./auth');
+const passport = require('./middlewares/auth');
+// const compression = require('compression');
+const morgan = require('morgan');
 require('dotenv').config();
 
 // routes
@@ -28,20 +31,24 @@ var corOptions = {
     origin: '*'
 }
 
-//middle ware;
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+
+//middleware;
+// app.use(compression());
+app.use(morgan('combined', { stream: accessLogStream }));
 app.use(cors(corOptions));
 app.use(bodyParser.json());
 
-app.use('/expenseForm', express.static(path.join(__dirname, 'expenseForm')));
+app.use('/expenseForm', express.static(path.join(__dirname, 'views', 'expenseForm')));
 app.use(express.static(__dirname));
 
 // Routes
 app.get('/addExpense', (req, res) => {
-    res.sendFile(path.join(__dirname, 'expenseForm', 'index.html'));
+    res.sendFile(path.join(__dirname, 'views', 'expenseForm', 'index.html'));
 });
 
 app.get('/user', (req, res) => {
-    res.sendFile(path.join(__dirname, 'user.html')); 
+    res.sendFile(path.join(__dirname, 'public', 'index.html')); 
 });
 
 app.use('/Cashfreeservices', express.static(path.join(__dirname, 'Cashfreeservices')));

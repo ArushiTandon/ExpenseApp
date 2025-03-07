@@ -1,17 +1,17 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
-const { generateToken } = require('../util/jwt');
+const { generateToken } = require('../middlewares/jwt');
 const sequelize = require('../util/db');
 
 
 exports.signUp = async (req, res) => {
-    console.log('signup Request Body(LoginController):');
+    
     const {username, email, password} = req.body;
     const t = await sequelize.transaction();
 
     try {
         const user = await User.findOne({ where: { username } });
-        console.log('Found User:', user)
+      
         if(user) {
             console.log('Username already exists');
             return res.status(200).json({ message: 'Username already exists'});
@@ -19,7 +19,7 @@ exports.signUp = async (req, res) => {
 
         const newUser = await User.create({username, email, password});
         await t.commit();
-        console.log('Signup - Password:', password);
+        
         res.status(201).json({userId: newUser.id})
     } catch (error) {
         await t.rollback();
@@ -29,7 +29,7 @@ exports.signUp = async (req, res) => {
 };
 
 exports.login = async(req, res) => {
-    console.log('Login Request Body(LoginController):', req.body);
+   
     const {username, password} = req.body;
     
     try {
@@ -49,7 +49,7 @@ exports.login = async(req, res) => {
         console.log('Password Valid:', isPasswordValid);
 
         if(!user || !(isPasswordValid)) {
-            console.log('Invalid username or password');
+            // console.log('Invalid username or password');
             return res.status(401).json({error: 'Invalid username or password'});
         }
 

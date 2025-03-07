@@ -1,6 +1,6 @@
 const express = require('express');
 require('dotenv').config();
-const { jwtAuthMiddleware } = require('../util/jwt')
+const { jwtAuthMiddleware } = require('../middlewares/jwt')
 const router = express.Router();
 
 const {getExpenses, addExpense, deleteExpense, updateExpense, searchExpense, leaderboard} = require('../controllers/expenseController');
