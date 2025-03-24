@@ -7,20 +7,23 @@ let expensesPerPage = localStorage.getItem("expensesPerPage")
 document.getElementById("expenseLimit").value = expensesPerPage;
 
 async function viewExpense(event, page = 1) {
+
     const reportType = event?.target 
         ? event.target.value 
         : document.querySelector("input[name='reportType']:checked")?.value;
 
     if (!reportType) return;
-
-    const apiUrl = `http://localhost:3000/report/${reportType}?page=${page}&limit=${expensesPerPage}`;
+    
+    const apiUrl = `http://localhost:3000/report/view/${reportType}?page=${page}&limit=${expensesPerPage}`;
     const token = localStorage.getItem("authToken");
-
+    
+    
     try {
         const response = await axios.get(apiUrl, {
             headers: { "x-auth-token": `Bearer ${token}` }
         });
-
+        
+        
         const { expenses, totalPages } = response.data;
 
         const reportTable = document.getElementById("reportOutputTable");
@@ -92,8 +95,72 @@ function updateExpenseLimit() {
     viewExpense(null, 1);  // Refresh with new limit
 }
 
+async function downloadReport() {
+  
+    const apiUrl = `http://localhost:3000/report/downloadreport`;
+    
+    const token = localStorage.getItem("authToken");
+
+    console.log("Token being sent:", token);
+
+    try {
+        const response = await axios.get(apiUrl, {
+            headers: { "x-auth-token": `Bearer ${token}` }
+        });
+
+        console.log("Server response:", response.data);
+
+        if (response.status === 200) {
+            var a = document.createElement('a');
+            a.href = response.data.fileUrl;
+            a.download = 'expense_report.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            fetchUserFiles();
+        } else {
+            alert("Failed to download report. Please try again.");
+        }
+
+    } catch (error) {
+        console.error("Error downloading report:", error);
+    }
+}
+
+async function fetchUserFiles() {
+
+    const apiUrl = `http://localhost:3000/user/files`;
+    const token = localStorage.getItem("authToken");
+
+    try {
+        const response = await axios.get(apiUrl, {
+            headers: { "x-auth-token": `Bearer ${token}` }
+        });
+
+        const data = response.data;
+
+        if (data.success) {
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+
+            data.files.forEach(file => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<a href="${file.fileUrl}" target="_blank">${file.filename}</a>`;
+                fileList.appendChild(listItem);
+            });
+        } else {
+            console.error('Error fetching files:', data.message);
+        }
+    } catch (err) {
+        console.error('Error:', err);
+    }
+}
+
+
 // Load default expenses on page load
 document.addEventListener("DOMContentLoaded", () => {
+    fetchUserFiles();
     document.querySelectorAll("input[name='reportType']").forEach(radio => {
         radio.addEventListener("change", (event) => {
             currentPage = 1;

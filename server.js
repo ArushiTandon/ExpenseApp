@@ -14,7 +14,7 @@ const purchaseRoutes = require('./routes/purchaseRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const userRoutes = require('./routes/userRoutes');
 const passwordRoutes = require('./routes/passwordRoutes');
-const reportRoutes = require('./routes/viewreportRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 // models
 const Order = require('./models/order');
@@ -33,7 +33,6 @@ var corOptions = {
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
 
-//middleware;
 // app.use(compression());
 app.use(morgan('combined', { stream: accessLogStream }));
 app.use(cors(corOptions));

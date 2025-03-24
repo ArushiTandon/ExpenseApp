@@ -1,11 +1,15 @@
-const express = require('express');
-const router = express.Router();
 const Expense = require('../models/expense');
 const { Op } = require("sequelize");
 const { startOfDay, startOfWeek, startOfMonth } = require("date-fns");
+const AwsServices = require('../services/AwsService');
+const { format } = require('date-fns');
+require('dotenv').config();
+
 
 exports.viewReport = async (req, res) => {
 
+    // console.log("CALLING VIEW REPORT");
+    
     let { page = 1, limit = 10 } = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
@@ -52,3 +56,32 @@ exports.viewReport = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 }
+
+exports.downloadReport = async (req, res) => {
+
+    try {
+
+        const formattedDate = format(new Date(), 'dd-MM-yyyy');
+
+        // console.log("calling downloadExpense");
+
+        // console.log("USER ID:", req.user);
+        
+        const expenses = await Expense.findAll({ where: { userId: req.user.id } });
+        
+        const stringifiedExpenses = JSON.stringify(expenses);
+        const userId = req.user.id;
+
+        const filename = `reports/Expenses_${userId}_${formattedDate}.txt`;
+
+        const fileUrl = await AwsServices.uploadToS3(userId, filename, stringifiedExpenses);
+        // console.log("Report successfully uploaded:", fileUrl);
+
+        res.status(200).json({ fileUrl, success: true });
+    } catch (error) {
+        console.error("Error generating report:", error);
+        res.status(500).json({ message: "Internal Server Error", success: false });
+    }
+}
+
+

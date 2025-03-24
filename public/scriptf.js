@@ -11,7 +11,7 @@ async function register(event) {
 
     try {
       const response =  await axios.post(`${apiUrl}/signup`, user);
-        console.log("User created successfully");
+        // console.log("User created successfully");
         alert(response.data.message);
         
     } catch (error) {
@@ -26,15 +26,13 @@ async function login(event) {
     
     const username = event.target.loginusername.value;
     const password = event.target.loginpassword.value;
-    
-    console.log('Sending Login Request(scriptf):', { username, password });
 
     try {
         const response = await axios.post(`${apiUrl}/login`, { username, password });
-        console.log('Login Response:', response.data);
+        // console.log('Login Response:', response.data);
 
         if (response.status === 200) {
-            console.log("User logged in successfully");
+            // console.log("User logged in successfully");
             alert(response.data.message);
 
             const token = response.data.token;

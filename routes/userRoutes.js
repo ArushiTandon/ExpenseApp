@@ -1,5 +1,5 @@
 const express = require('express');
-const { signUp, login, getUserInfo } = require('../controllers/userController');
+const { signUp, login, getUserInfo, getUserFiles } = require('../controllers/userController');
 const router = express.Router();
 const passport = require('../middlewares/auth');
 const { jwtAuthMiddleware } = require('../middlewares/jwt');
@@ -15,5 +15,8 @@ router.post('/login', localAuthMid, login);
 
 // UserInfo
 router.get('/userinfo', jwtAuthMiddleware, getUserInfo);
+
+// Get user files
+router.get('/files' , jwtAuthMiddleware, getUserFiles);
 
 module.exports = router;

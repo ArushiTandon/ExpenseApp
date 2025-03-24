@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const UserFile = require('../models/userFiles');
 const { generateToken } = require('../middlewares/jwt');
 const sequelize = require('../util/db');
-
 
 exports.signUp = async (req, res) => {
     
@@ -20,7 +20,9 @@ exports.signUp = async (req, res) => {
         const newUser = await User.create({username, email, password});
         await t.commit();
         
-        res.status(201).json({userId: newUser.id})
+        res.status(201).json({userId: newUser.id,
+            message: 'ACCOUNT CREATED!',
+        })
     } catch (error) {
         await t.rollback();
         console.error('ERROR:', error);
@@ -35,15 +37,15 @@ exports.login = async(req, res) => {
     try {
         
         const user = await User.findOne({ where: { username } });
-        console.log('Found User:', user);
+        // console.log('Found User:', user);
 
         if (!user) {
             console.log('Invalid username or password');
             return res.status(401).json({ error: 'Invalid username or password' });
         }
 
-        console.log('Login - Stored Hash:', user.password);
-        console.log('Login - Password Match:', await bcrypt.compare(password, user.password));
+        // console.log('Login - Stored Hash:', user.password);
+        // console.log('Login - Password Match:', await bcrypt.compare(password, user.password));
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         console.log('Password Valid:', isPasswordValid);
@@ -86,3 +88,21 @@ exports.getUserInfo = async (req, res) => {
     }
   };
   
+  exports.getUserFiles = async (req, res) => {
+
+    try {
+        const userId = req.user.id;
+
+        const files = await UserFile.findAll({
+            where: { userId },
+            order: [['createdAt', 'DESC']],
+        });
+
+        res.json({success: true, files});
+        
+    } catch (error) {
+        console.error('Error fetching user files:', error);
+        res.status(500).json({success: false, message: 'Failed to fetch'});   
+    }
+
+  };

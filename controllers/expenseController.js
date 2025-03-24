@@ -1,6 +1,8 @@
 const Expense = require('../models/expense');
 const User = require('../models/User')
 const sequelize = require('../util/db');
+require('dotenv').config();
+
 
 exports.getExpenses = async (req, res) => {
     try {
