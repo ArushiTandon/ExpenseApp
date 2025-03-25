@@ -23,7 +23,7 @@ const expense = require('./models/expense');
 const Password = require('./models/password');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(passport.initialize());
 
