@@ -6,7 +6,6 @@ const cors = require('cors');
 const path = require('path');
 const sequelize = require('./util/db');
 const passport = require('./middlewares/auth');
-// const compression = require('compression');
 const morgan = require('morgan');
 require('dotenv').config();
 
@@ -28,15 +27,10 @@ const PORT = process.env.PORT;
 
 app.use(passport.initialize());
 
-var corOptions = {
-    origin: '*'
-}
-
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
 
-// app.use(compression());
 app.use(morgan('combined', { stream: accessLogStream }));
-app.use(cors(corOptions));
+app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/expenseForm', express.static(path.join(__dirname, 'views', 'expenseForm')));

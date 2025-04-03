@@ -101,14 +101,14 @@ async function downloadReport() {
     
     const token = localStorage.getItem("authToken");
 
-    console.log("Token being sent:", token);
+    // console.log("Token being sent:", token);
 
     try {
         const response = await axios.get(apiUrl, {
             headers: { "x-auth-token": `Bearer ${token}` }
         });
 
-        console.log("Server response:", response.data);
+        // console.log("Server response:", response.data);
 
         if (response.status === 200) {
             var a = document.createElement('a');

@@ -3,8 +3,8 @@ const { Cashfree } = require("cashfree-pg");
 const { v4: uuidv4 } = require("uuid");
 const Order = require("../models/order");
 const User = require('../models/User');
-const axios = require('axios');
-const jwt = require('jsonwebtoken');
+// const axios = require('axios');
+// const jwt = require('jsonwebtoken');
 const path = require('path');
 
 
@@ -69,12 +69,12 @@ exports.createOrder = async (req, res) => {
 
 exports.transactionStatus = async (req, res) => {
     const orderId = req.params.orderId;
-    const token = req.query.token;
+    // const token = req.query.token;
     // const decoded = jwt.verify(token, process.env.JWT_SECRET); 
     const userId = req.user.id; 
-    const { order_amount } = req.body;
+    // const { order_amount } = req.body;
 
-    console.log("INSIDE TRANSACTION STATUS API:", orderId);  
+    // console.log("INSIDE TRANSACTION STATUS API:", orderId);  
     
 
     try {
@@ -104,7 +104,7 @@ exports.getPaymentStatus = async (orderId) => {
         const response = await Cashfree.PGOrderFetchPayments("2023-08-01", orderId);
         const getOrderResponse = response.data;
 
-        console.log(getOrderResponse.length);
+        // console.log(getOrderResponse.length);
         
         let orderStatus;
 
@@ -137,44 +137,9 @@ exports.getPaymentStatus = async (orderId) => {
 };
 
 exports.orderStatus = async (req, res) => {
-    const orderId = req.params.orderId;
-    // You might want to do some server-side logging or processing here.
-    console.log('Serving orderStatus page for Order ID:', orderId);
+    // const orderId = req.params.orderId;
 
-    // Send the HTML page that includes client-side code (orderStatus.js)
+    // console.log('Serving orderStatus page for Order ID:', orderId);
+
     res.sendFile(path.join(__dirname, '..', 'Cashfreeservices', 'orderStatus.html'));
 };
-
-// exports.orderStatus = async (req, res) => {
-//     const orderId = req.params.orderId;
-//     // const token = req.query.token; // Extract token from query parameters
-
-//     try {
-//         // // Verify the token
-//         // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//         // const userId = decoded.id;
-
-//         // Call the transactionStatus API
-//         // const response = await axios.get(`http://localhost:3000/purchase/transactionstatus/${orderId}`, {
-//         //     headers: {
-//         //         "x-auth-token": `Bearer ${token}`
-//         //     }
-//         // });
-
-//         // const orderStatus = response.data.orderStatus;
-        
-//         return res.status(200).send({ success: true, orderId: orderId});
-
-
-//     } catch (error) {
-//         console.error('Error:', error.message);
-//         return res.status(500).send('Error processing your order.');
-//     }
-// };
-
-
-// if (payment_status === "SUCCESS") {
-//     window.location.href = "http://localhost:3000/addExpense";
-//   } else {
-//     alert("Payment was not successful. Please try again.");
-//   }

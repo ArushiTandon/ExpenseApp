@@ -38,10 +38,10 @@ async function saveOrUpdate(event) {
         { amount, description, category, date },
         { headers: headers }
       );
-      console.log("Expense added successfully.");
+      // console.log("Expense added successfully.");
     }
   } catch (error) {
-    console.error("Error updating expense:", error);
+    // console.error("Error updating expense:", error);
     alert("Failed to save or update expense. Please try again later.");
   }
 
@@ -79,10 +79,10 @@ async function premium(event) {
       redirect: "redirect",
     };
 
-    // Initiating payment using cashfree
+    // Initiating payment
     const result = await cashfree.checkout(checkoutOptions);
     console.log("Cashfree checkout completed!", result);
-    console.log("Payment process completed");
+    // console.log("Payment process completed");
 
       fetchUserInfo(token);
     
@@ -90,27 +90,6 @@ async function premium(event) {
     console.error("Error during purchase:", error);
   }
 }
-
-// async function searchExpense(event) {
-//   event.preventDefault();
-
-//   const apiUrl = "http://localhost:3000/expense";
-
-//   const token = localStorage.getItem("authToken");
-//   const date = document.getElementById("date").value;
-//   try {
-//     const response = await axios.get(`${apiUrl}/${date}`, {
-//       headers: {
-//         ["x-auth-token"]: `Bearer ${token}`,
-//       },
-//     });
-
-//     const expenseData = response.data;
-//     displayExpense(expenseData);
-//   } catch (error) {
-//     console.error("CAN'T SEARCH EXPENSE JS:", error);
-//   }
-// }
 
 async function loadExpenses() {
   const apiUrl = "http://localhost:3000/expense";
@@ -213,7 +192,7 @@ function displayPremiumMessage() {
     premiumBtn.style.display = "none";
   }
 
-  // Display the premium user message
+  // Display the premium user
   const premiumBox = document.querySelector("#expenseFormHeader");
   if (premiumBox) {
     premiumBox.innerHTML += `<button type="button" class="btn fw-bold btn-primary">Premium</button>`;
@@ -229,7 +208,7 @@ function displayBuyPremiumButton() {
 
 async function fetchUserInfo(token) {
   try {
-    console.log("INSIDE FETCH USER INFO");
+    // console.log("INSIDE FETCH USER INFO");
 
     const response = await axios.get("http://localhost:3000/user/userinfo", {
       headers: { "x-auth-token": `Bearer ${token}` },
