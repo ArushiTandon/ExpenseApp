@@ -2,107 +2,80 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const UserFile = require('../models/userFiles');
 const { generateToken } = require('../middlewares/jwt');
-const sequelize = require('../util/db');
 
 exports.signUp = async (req, res) => {
-    
-    const {username, email, password} = req.body;
-    const t = await sequelize.transaction();
+  const { username, email, password } = req.body;
 
-    try {
-        const user = await User.findOne({ where: { username } });
-      
-        if(user) {
-            console.log('Username already exists');
-            return res.status(200).json({ message: 'Username already exists'});
-        }
-
-        const newUser = await User.create({username, email, password});
-        await t.commit();
-        
-        res.status(201).json({userId: newUser.id,
-            message: 'ACCOUNT CREATED!',
-        })
-    } catch (error) {
-        await t.rollback();
-        console.error('ERROR:', error);
-        res.status(400).json({error: 'Error creating user'});
+  try {
+    // Check if username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(200).json({ message: 'Username already exists' });
     }
+
+    // Create new user; password hash handled by Mongoose pre-save hook
+    const newUser = new User({ username, email, password });
+    await newUser.save();
+
+    res.status(201).json({ userId: newUser._id, message: 'ACCOUNT CREATED!' });
+  } catch (error) {
+    console.error('ERROR:', error);
+    res.status(400).json({ error: 'Error creating user' });
+  }
 };
 
-exports.login = async(req, res) => {
-   
-    const {username, password} = req.body;
-    
-    try {
-        
-        const user = await User.findOne({ where: { username } });
-        // console.log('Found User:', user);
+exports.login = async (req, res) => {
+  const { username, password } = req.body;
 
-        if (!user) {
-            console.log('Invalid username or password');
-            return res.status(401).json({ error: 'Invalid username or password' });
-        }
-
-        // console.log('Login - Stored Hash:', user.password);
-        // console.log('Login - Password Match:', await bcrypt.compare(password, user.password));
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        console.log('Password Valid:', isPasswordValid);
-
-        if(!user || !(isPasswordValid)) {
-            // console.log('Invalid username or password');
-            return res.status(401).json({error: 'Invalid username or password'});
-        }
-
-        const payload = {
-            id: user.id,
-            username: user.username,
-        };
-
-        const token = generateToken(payload);
-
-        return res.status(200).json({
-            message: 'Login successful!',
-            token: token,
-            redirectUrl: '/addExpense',
-        });
-
-    } catch (error) {
-        console.error('error:', error);
-        res.status(400).json({error: 'Error logging in'});
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid username or password' });
     }
-}
+
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    const payload = {
+      id: user._id,
+      username: user.username,
+    };
+    const token = generateToken(payload);
+
+    res.status(200).json({
+      message: 'Login successful!',
+      token,
+      redirectUrl: '/addExpense',
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(400).json({ error: 'Error logging in' });
+  }
+};
 
 exports.getUserInfo = async (req, res) => {
-    const userId = req.user.id;
-    
-    try {
-      const user = await User.findByPk(userId, {
-        attributes: ['id', 'username', 'email', 'isPremium'],
-      });
-      res.status(200).json(user);
-    } catch (error) {
-      console.error('Error fetching user info:', error.message);
-      res.status(500).json({ error: 'Failed to fetch user info' });
-    }
-  };
+  const userId = req.user.id;
+
+  try {
+    const user = await User.findById(userId).select('id username email isPremium');
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error fetching user info:', error.message);
+    res.status(500).json({ error: 'Failed to fetch user info' });
+  }
+};
+
   
-  exports.getUserFiles = async (req, res) => {
+ exports.getUserFiles = async (req, res) => {
+  const userId = req.user.id;
 
-    try {
-        const userId = req.user.id;
-
-        const files = await UserFile.findAll({
-            where: { userId },
-            order: [['createdAt', 'DESC']],
-        });
-
-        res.json({success: true, files});
-        
-    } catch (error) {
-        console.error('Error fetching user files:', error);
-        res.status(500).json({success: false, message: 'Failed to fetch'});   
-    }
-
-  };
+  try {
+    const files = await UserFile.find({ userId }).sort({ createdAt: -1 });
+    res.json({ success: true, files });
+  } catch (error) {
+    console.error('Error fetching user files:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch' });
+  }
+};

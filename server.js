@@ -1,70 +1,40 @@
-//starting project
 const express = require('express');
 const fs = require('fs');
-const bodyParser = require('body-parser');
-const cors = require('cors');
 const path = require('path');
-const sequelize = require('./util/db');
+const connectDB = require('./util/db');
 const passport = require('./middlewares/auth');
 const morgan = require('morgan');
 require('dotenv').config();
 
-// routes
-const purchaseRoutes = require('./routes/purchaseRoutes');
-const expenseRoutes = require('./routes/expenseRoutes');
-const userRoutes = require('./routes/userRoutes');
-const passwordRoutes = require('./routes/passwordRoutes');
-const reportRoutes = require('./routes/reportRoutes');
-
-// models
-const Order = require('./models/order');
-const User = require('./models/User');
-const expense = require('./models/expense');
-const Password = require('./models/password');
-
 const app = express();
 const PORT = process.env.PORT;
+
+connectDB();
 
 app.use(passport.initialize());
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
-
 app.use(morgan('combined', { stream: accessLogStream }));
-app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/expenseForm', express.static(path.join(__dirname, 'views', 'expenseForm')));
 app.use(express.static(__dirname));
 
-// Routes
 app.get('/addExpense', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'expenseForm', 'index.html'));
+  res.sendFile(path.join(__dirname, 'views', 'expenseForm', 'index.html'));
 });
 
 app.get('/user', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html')); 
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Routes
 app.use('/Cashfreeservices', express.static(path.join(__dirname, 'Cashfreeservices')));
-app.use('/user', userRoutes);
-app.use('/expense', expenseRoutes);
-app.use('/purchase', purchaseRoutes);
-app.use('/password', passwordRoutes);
-app.use('/report', reportRoutes);
+app.use('/user', require('./routes/userRoutes'));
+app.use('/expense', require('./routes/expenseRoutes'));
+app.use('/purchase', require('./routes/purchaseRoutes'));
+app.use('/password', require('./routes/passwordRoutes'));
+app.use('/report', require('./routes/reportRoutes'));
 
-
-User.hasMany(expense, { foreignKey: 'userId' });
-expense.belongsTo(User, { foreignKey: 'userId' });
-
-User.hasMany(Order, { foreignKey: 'userId' });
-Order.belongsTo(User, { foreignKey: 'userId' });
-
-User.hasMany(Password, { foreignKey: 'userId' });
-Password.belongsTo(User, { foreignKey: 'userId' });
-
-sequelize.sync({ alter: false })
-    .then(() => {
-        console.log('Database synced');
-        app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
-    })
-    .catch((err) => console.error('Failed to sync database:', err));
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

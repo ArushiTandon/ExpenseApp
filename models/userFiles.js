@@ -1,28 +1,10 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../util/db');
+const mongoose = require('mongoose');
 
-const UserFile = sequelize.define('UserFile', {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-    },
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    filename: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    fileUrl: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    createdAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-    }
+const userFileSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  filename: { type: String, required: true },
+  fileUrl: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = UserFile;
+module.exports = mongoose.model('UserFile', userFileSchema);

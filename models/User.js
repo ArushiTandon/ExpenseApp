@@ -1,48 +1,22 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../util/db');
+const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const User = sequelize.define(
-    'User',
-    {
-        username: {
-            type: DataTypes.STRING,
-            unique: true,
-            allowNull: false,
-        },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-            validate: {
-                isEmail: true,
-            },
-        },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        isPremium: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
-    },
-    {
-        timestamps: false,
-    }
-);
-
-User.beforeCreate(async (user) => {
-    user.password = await bcrypt.hash(user.password, 10);
+const userSchema = new mongoose.Schema({
+  username: { type: String, unique: true, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  isPremium: { type: Boolean, default: false },
+  totalexpense: { type: Number, default: 0 },
 });
 
-User.prototype.comparePassword = async function (userPassword) {
-    try {
-        const isMatch = await bcrypt.compare(userPassword, this.password);
-        return isMatch;
-    } catch (error) {
-        throw error;
-    }
+userSchema.pre('save', async function () {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+});
+
+userSchema.methods.comparePassword = async function (candidate) {
+  return bcrypt.compare(candidate, this.password);
 };
 
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);
