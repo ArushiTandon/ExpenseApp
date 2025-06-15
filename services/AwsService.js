@@ -1,41 +1,45 @@
-const { S3Client } = require("@aws-sdk/client-s3");
-const { Upload } = require("@aws-sdk/lib-storage");
-require("dotenv").config();
-const UserFile = require("../models/userFiles");
-
-// Initialize the S3 client outside the function to avoid re-creating it on every call
-const s3 = new S3Client({
-    region: "your-region", // e.g., 'ap-south-1'
-    credentials: {
-        accessKeyId: process.env.IAM_USER_KEY,
-        secretAccessKey: process.env.IAM_USER_SECRET,
-    },
-});
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+require('dotenv').config();
+const UserFile = require('../models/userFiles');
 
 exports.uploadToS3 = async (userId, filename, data) => {
     try {
-        const upload = new Upload({
-            client: s3,
-            params: {
-                Bucket: "expensetrackerapp1",
-                Key: filename,
-                Body: data,
-                ACL: "public-read",
-            },
+        const Bucket_name = 'eptapp1';
+        const IAM_USER_KEY = process.env.IAM_USER_KEY;
+        const IAM_USER_SECRET = process.env.IAM_USER_SECRET;
+
+        // Create S3 client
+        const s3Client = new S3Client({
+            region: 'ap-south-1', // e.g., 'ap-south-1'
+            credentials: {
+                accessKeyId: IAM_USER_KEY,
+                secretAccessKey: IAM_USER_SECRET
+            }
         });
 
-        const result = await upload.done();
-        console.log("File uploaded successfully:", result);
+        // Create upload command
+        const command = new PutObjectCommand({
+            Bucket: Bucket_name,
+            Key: filename,
+            Body: data,
+            ContentDisposition: 'attachment',
+            ACL: 'public-read', 
+        });
+
+        const result = await s3Client.send(command);
+        console.log('File uploaded successfully:', result);
+
+        const fileUrl = `https://${Bucket_name}.s3.amazonaws.com/${filename}`;
 
         await UserFile.create({
             userId,
             filename,
-            fileUrl: result.Location,
+            fileUrl
         });
 
-        return result.Location;
+        return fileUrl;
     } catch (err) {
-        console.error("Error uploading file:", err);
+        console.error('Error uploading file:', err);
         throw err;
     }
 };

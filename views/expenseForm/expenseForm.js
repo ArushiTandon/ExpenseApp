@@ -138,7 +138,7 @@ async function loadExpenses() {
       deleteBtn.className = "delete-btn btn btn-danger";
       deleteBtn.onclick = async () => {
         try {
-          await axios.delete(`${apiUrl}/${expense.id}`, {
+          await axios.delete(`${apiUrl}/${expense._id}`, {
             headers: { ["x-auth-token"]: `Bearer ${token}` }, // Attach token
           });
           loadExpenses();
@@ -155,7 +155,7 @@ async function loadExpenses() {
         document.getElementById("amount").value = expense.amount;
         document.getElementById("text").value = expense.description;
         document.getElementById("expense").value = expense.category;
-        document.getElementById("Tracker").dataset.id = expense.id;
+        document.getElementById("Tracker").dataset.id = expense._id;
         document.getElementById("date").value = expense.date;
       };
 

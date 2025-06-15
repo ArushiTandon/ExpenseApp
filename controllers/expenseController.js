@@ -38,8 +38,12 @@ exports.deleteExpense = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
 
+  console.log('req.params:', req.params);
+console.log('req.body:', req.body);
+console.log('req.query:', req.query);
   try {
     const deleted = await Expense.findOneAndDelete({ _id: id, userId });
+
     if (!deleted) return res.status(404).json({ error: 'Expense not found' });
 
     const totalExpense = await Expense.aggregate([
@@ -63,9 +67,12 @@ exports.updateExpense = async (req, res) => {
   const userId = req.user.id;
 
   try {
+    const updateFields = { amount, description, category };
+    if (date) updateFields.date = date;
+
     const updatedExpense = await Expense.findOneAndUpdate(
       { _id: id, userId },
-      { amount, description, category, date },
+      updateFields,
       { new: true }
     );
 

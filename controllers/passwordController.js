@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const UserFile = require('../models/userFiles');
-const { generateToken } = require('../middlewares/jwt');
 const ForgotPassword = require('../models/password');
 const Brevo = require('sib-api-v3-sdk');
 const uuid = require('uuid');
