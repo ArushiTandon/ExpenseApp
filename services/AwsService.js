@@ -10,14 +10,14 @@ exports.uploadToS3 = async (userId, filename, data) => {
 
         // Create S3 client
         const s3Client = new S3Client({
-            region: 'ap-south-1', // e.g., 'ap-south-1'
+            region: process.env.AWS_REGION,
             credentials: {
                 accessKeyId: IAM_USER_KEY,
                 secretAccessKey: IAM_USER_SECRET
             }
         });
 
-        // Create upload command
+      
         const command = new PutObjectCommand({
             Bucket: Bucket_name,
             Key: filename,

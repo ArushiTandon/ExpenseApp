@@ -1,10 +1,8 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
-const UserFile = require('../models/userFiles');
 const ForgotPassword = require('../models/password');
 const Brevo = require('sib-api-v3-sdk');
 const uuid = require('uuid');
-require('dotenv').config();
 
 const defaultClient = Brevo.ApiClient.instance;
 const apiKey = defaultClient.authentications['api-key'];

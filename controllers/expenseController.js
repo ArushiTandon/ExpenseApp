@@ -37,10 +37,7 @@ exports.addExpense = async (req, res) => {
 exports.deleteExpense = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
-
-  console.log('req.params:', req.params);
-console.log('req.body:', req.body);
-console.log('req.query:', req.query);
+  
   try {
     const deleted = await Expense.findOneAndDelete({ _id: id, userId });
 

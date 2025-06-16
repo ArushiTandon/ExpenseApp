@@ -12,7 +12,6 @@ exports.signUp = async (req, res) => {
       return res.status(200).json({ message: 'Username already exists' });
     }
 
-    // Create new user; password hash handled by Mongoose pre-save hook
     const newUser = new User({ username, email, password });
     await newUser.save();
 

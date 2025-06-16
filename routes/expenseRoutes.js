@@ -1,5 +1,4 @@
 const express = require('express');
-require('dotenv').config();
 const { jwtAuthMiddleware } = require('../middlewares/jwt')
 const router = express.Router();
 

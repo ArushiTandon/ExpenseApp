@@ -3,7 +3,6 @@ const { signUp, login, getUserInfo, getUserFiles } = require('../controllers/use
 const router = express.Router();
 const passport = require('../middlewares/auth');
 const { jwtAuthMiddleware } = require('../middlewares/jwt');
-require('dotenv').config();
 
 const localAuthMid = passport.authenticate('local', {session: false});
 
