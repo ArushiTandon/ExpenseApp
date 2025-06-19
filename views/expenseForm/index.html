@@ -15,17 +15,22 @@
   </head>
 
   <body>
+    <!-- Logout button at top right -->
+    <div class="logout-btn-wrapper position-absolute top-0 end-0 m-3">
+      <button class="btn btn-danger" onclick="logout()">Logout</button>
+    </div>
 
    <div class="sidebar d-flex flex-column">
-        <a href="/views/expenseForm/index.html">➕ Add Expense</a>
-        <a href="/views/PremiumFeatures/viewExpense/viewExpense.html" class="active">📊 View Report</a>
+        <a href="/addExpense">➕ Add Expense</a>
+        <a href="/viewreport" class="active">📊 View Report</a>
     </div>
 
     <div class="container">
-        <div id ="expenseFormHeader" class="d-flex justify-content-between align-items-center">
-            <div></div> 
-            <h1 class="text-center flex-grow-1">Expense Tracker</h1>
-        </div>
+        <div id="expenseFormHeader" class="d-flex justify-content-between align-items-center">
+  <div></div> 
+  <h1 class="text-center flex-grow-1">Expense Tracker</h1>
+</div>
+
 
         
         <div class="form-box">

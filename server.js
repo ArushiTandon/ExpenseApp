@@ -20,6 +20,10 @@ app.get('/addExpense', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'expenseForm', 'index.html'));
 });
 
+app.get('/viewreport', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'PremiumFeatures', 'viewExpense', 'viewExpense.html'));
+});
+
 app.get('/user', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

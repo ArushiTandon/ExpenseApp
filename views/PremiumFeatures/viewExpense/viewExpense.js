@@ -157,14 +157,25 @@ async function fetchUserFiles() {
     }
 }
 
+function logout() {
+    localStorage.removeItem('authToken');
+    window.location.href = 'http://localhost:3000/user';
+  }
+
 
 // Load default expenses on page load
 document.addEventListener("DOMContentLoaded", () => {
-    fetchUserFiles();
-    document.querySelectorAll("input[name='reportType']").forEach(radio => {
-        radio.addEventListener("change", (event) => {
-            currentPage = 1;
-            viewExpense(event, currentPage);
-        });
-    });
+    const token = localStorage.getItem("authToken");
+  if (!token) {
+    window.location.href = `http://localhost:3000/user`;
+    alert("Please log in to access the expense tracker.");
+  } else {
+      fetchUserFiles();
+      document.querySelectorAll("input[name='reportType']").forEach(radio => {
+          radio.addEventListener("change", (event) => {
+              currentPage = 1;
+              viewExpense(event, currentPage);
+          });
+      });
+  }
 });

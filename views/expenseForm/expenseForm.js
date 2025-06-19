@@ -273,10 +273,17 @@ async function leaderboardDisplay(event) {
   }
 }
 
+  function logout() {
+    localStorage.removeItem('authToken');
+    window.location.href = 'http://localhost:3000/user';
+  }
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("authToken");
   if (!token) {
-    window.location.href = `http://localhost:3000`;
+    window.location.href = `http://localhost:3000/user`;
+    alert("Please log in to access the expense tracker.");
   } else {
     fetchUserInfo(token);
     loadExpenses();
